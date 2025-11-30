@@ -3,13 +3,8 @@ multiple-precision arithmetic.  gmpy2 is based on the original gmpy module.
 gmpy2 adds support for correctly rounded multiple-precision real arithmetic
 (using the MPFR library) and complex arithmetic (using the MPC library).
 
-Version 2.3
------------
-
-gmpy2 2.3.0
------------
-
-gmpy2 2.3.0 supports Python 3.14 and free-threaded builds,
+Version 2.3 (development)
+-------------------------
 
 * Preliminary support for free-threaded builds.
 * Fix behavior and memory leaks for contexts.
@@ -18,15 +13,6 @@ gmpy2 2.3.0 supports Python 3.14 and free-threaded builds,
 * Add missing methods to `mpz` and `mpq`.
 * Fix round(mpz, ndigits) if ndigits is negative.
 * Improved support for mixed `mpfr` and `mpc` arithmetic.
-
-Version 2.2
------------
-
-gmpy2 2.2.2 (released as 2.3.0)
--------------------------------
-
-* Many bug fixes.
-* Initial support for free-threaded builds.
 
 gmpy2 2.2.1
 -----------

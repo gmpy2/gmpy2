@@ -1,0 +1,87 @@
+name: Publish on PyPI
+on: push
+jobs:
+  build:
+    name: Build distribution
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: "3.x"
+    - run: pip install build
+    - name: Cache GNU GMP/MPFR/MPC builds
+      id: cache-gmp
+      uses: actions/cache@v4
+      with:
+        path: .local
+        key: ${{ matrix.os }}-${{ hashFiles('scripts/*') }}
+    - run: bash scripts/cibw_before_all.sh
+      if: steps.cache-gmp.outputs.cache-hit != 'true'
+    - run: python -m build -s
+      env:
+        PKG_CONFIG_PATH: ${{ github.workspace }}/.local/lib/pkgconfig
+    - uses: actions/upload-artifact@v5
+      with:
+        name: gmpy2-sdist
+        path: dist/
+  wheels:
+    uses: ./.github/workflows/wheels.yml
+    if: startsWith(github.ref, 'refs/tags/')
+  publish-to-pypi:
+    name: Publish distribution to PyPI
+    needs:
+      - build
+      - wheels
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi
+      url: https://pypi.org/p/gmpy2
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v6
+      with:
+        pattern: gmpy2-*
+        path: dist/
+        merge-multiple: true
+    - uses: pypa/gh-action-pypi-publish@release/v1
+  github-release:
+    name: >-
+      Sign the Python distribution with Sigstore
+      and upload them to GitHub Release
+    needs:
+      - publish-to-pypi
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v6
+      with:
+        pattern: gmpy2-*
+        path: dist/
+        merge-multiple: true
+    - uses: sigstore/gh-action-sigstore-python@v3.1.0
+      with:
+        inputs: >-
+          ./dist/*.tar.gz
+          ./dist/*.whl
+    - name: Create GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: >-
+        gh release create '${{ github.ref_name }}'
+        --repo '${{ github.repository }}'
+        --prerelease
+        --generate-notes
+    - name: Upload artifact signatures to GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: >-
+        gh release upload
+        '${{ github.ref_name }}' dist/**
+        --repo '${{ github.repository }}'

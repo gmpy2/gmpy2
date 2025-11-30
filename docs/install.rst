@@ -1,7 +1,7 @@
 Installation
 ============
 
-gmpy2 requires CPython 3.8 or above.  Pre-compiled binary wheels are available
+gmpy2 requires CPython 3.9 or above.  Pre-compiled binary wheels are available
 on PyPI.  You can install latest release with pip::
 
     pip install gmpy2
@@ -34,7 +34,7 @@ to install from the git repository and include required extra dependencies,
 for example the optional "tests" list, which include packages required
 for testing::
 
-    git clone git://github.com/aleaxit/gmpy.git
+    git clone git://github.com/gmpy2/gmpy2.git
     cd gmpy
     pip install -e .[tests]
 

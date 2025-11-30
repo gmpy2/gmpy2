@@ -1,6 +1,6 @@
 name: Build Wheels
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch, workflow_call]
 
 jobs:
   build_wheels:
@@ -17,7 +17,7 @@ jobs:
             msystem: clangarm64
             menv: clang-aarch64
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: msys2/setup-msys2@v2
         name: Setup msys2
         with:
@@ -40,7 +40,7 @@ jobs:
       - run: echo "PKG_CONFIG_PATH=${{ github.workspace }}/.local/lib/pkgconfig" >> $env:GITHUB_ENV
         if: contains(matrix.os, 'windows')
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.2.1
+        uses: pypa/cibuildwheel@v3.3.0
       - uses: actions/upload-artifact@v5
         with:
           name: wheels-${{ matrix.os }}
@@ -52,6 +52,6 @@ jobs:
       - name: Merge Wheels
         uses: actions/upload-artifact/merge@v5
         with:
-          name: wheels
+          name: gmpy2-wheels
           pattern: wheels-*
           delete-merged: true

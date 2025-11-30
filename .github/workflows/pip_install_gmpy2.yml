@@ -15,7 +15,7 @@ jobs:
       LDFLAGS: -L/opt/homebrew/lib
       MACOSX_DEPLOYMENT_TARGET: 10.15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
@@ -50,7 +50,7 @@ jobs:
       PYTEST_ADDOPTS: --verbose
       CFLAGS: -Wall -Wpedantic -Werror -std=c17
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}

@@ -38,7 +38,7 @@ MSYS2 Steps
 3.  Clone (or download) the full gmpy2 source code::
 
       cd ~/temp
-      git clone https://github.com/aleaxit/gmpy.git
+      git clone https://github.com/gmpy2/gmpy2.git
       cd gmpy
 
 4.  Download and compile GMP, MPFR, and MPC:
