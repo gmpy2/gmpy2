@@ -67,8 +67,8 @@ extern "C" {
 
 /* Check for minimum Python version requirements. */
 
-#if PY_VERSION_HEX < 0x03090000
-#  error "GMPY2 requires Python 3.9 or later."
+#if PY_VERSION_HEX < 0x030A0000
+#  error "GMPY2 requires Python 3.10 or later."
 #endif
 
 /* Include headers for GMP, MPFR, and MPC. */
