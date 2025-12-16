@@ -476,6 +476,7 @@ GMPy_MPFR_New(mpfr_prec_t bits, CTXT_Object *context)
         result = global.gmpympfrcache[--(global.in_gmpympfrcache)];
         Py_INCREF((PyObject*)result);
         mpfr_set_prec(result->f, bits);
+        mpfr_setsign(result->f, result->f, 0, GET_MPFR_ROUND(context));
     }
     else {
         result = PyObject_New(MPFR_Object, &MPFR_Type);
@@ -642,6 +643,10 @@ GMPy_MPC_New(mpfr_prec_t rprec, mpfr_prec_t iprec, CTXT_Object *context)
         Py_INCREF((PyObject*)result);
         if (rprec == iprec) {
             mpc_set_prec(result->c, rprec);
+            mpfr_setsign(mpc_realref(result->c), mpc_realref(result->c),
+                         0, GET_REAL_ROUND(context));
+            mpfr_setsign(mpc_imagref(result->c), mpc_imagref(result->c),
+                         0, GET_IMAG_ROUND(context));
         }
         else {
             mpc_clear(result->c);
