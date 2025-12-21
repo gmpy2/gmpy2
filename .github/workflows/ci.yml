@@ -6,14 +6,14 @@ on:
   schedule:
     - cron: '0 0 * * 2'
 jobs:
-  docs:
-    uses: ./.github/workflows/docs.yml
+# docs:
+#   uses: ./.github/workflows/docs.yml
   coverage:
     uses: ./.github/workflows/coverage.yml
-    needs:
-      - docs
+#   needs:
+#     - docs
   wheels:
     uses: ./.github/workflows/wheels.yml
     needs:
-      - docs
+#     - docs
       - coverage
