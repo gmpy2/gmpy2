@@ -24,21 +24,6 @@
  * License along with GMPY2; if not, see <http://www.gnu.org/licenses/>    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
- /* Todo list
-  * ---------
-  * Add all MPFR and MPC functions as context methods.
-  * All MPFR and MPC functions need to set exponent range on entry. The
-  *    current approach where only set_context() and context.__enter__ set
-  *    the exponent range fails for context methods.
-  * Should a read-only (or template) context prevent the setting of
-  *    exception flags?
-  * Add context option to control the result of integer division:
-  *    integer (mpz), exact (mpq), or true (mpfr).
-  * Add modular arithmetic functions.
-  * Implement Chinese Remainder Theorem.
-  * Update PRP code.
-  */
-
 /*
  * originally written for GMP-2.0 (by AMK...?)
  * Rewritten by Niels Möller, May 1996
@@ -106,10 +91,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /* The following global strings are used by gmpy_misc.c. */
-
-#define GMPY_VERSION "2.3.0a2"
-
-char gmpy_version[] = GMPY_VERSION;
 
 char gmpy_license[] = "\
 The GMPY2 source code is licensed under LGPL 3 or later. The supported \
@@ -251,10 +232,6 @@ static PyObject *GMPyExc_Erange = NULL;
 #include "gmpy2_mpz_misc.c"
 #include "gmpy2_xmpz_misc.c"
 #include "gmpy2_xmpz_limbs.c"
-
-#ifdef VECTOR
-#include "gmpy2_vector.c"
-#endif
 
 /* Include gmpy_context last to avoid adding doc names to .h files. */
 
@@ -502,10 +479,6 @@ static PyMethodDef Pygmpy_methods [] =
     { "tan", GMPy_Context_Tan, METH_O, GMPy_doc_function_tan },
     { "tanh", GMPy_Context_Tanh, METH_O, GMPy_doc_function_tanh },
     { "trunc", GMPy_Context_Trunc, METH_O, GMPy_doc_function_trunc},
-#ifdef VECTOR
-    { "vector", GMPy_Context_Vector, METH_O, GMPy_doc_function_vector},
-    { "vector2", GMPy_Context_Vector2, METH_VARARGS, GMPy_doc_function_vector2},
-#endif
     { "yn", GMPy_Context_Yn, METH_VARARGS, GMPy_doc_function_yn },
     { "y0", GMPy_Context_Y0, METH_O, GMPy_doc_function_y0 },
     { "y1", GMPy_Context_Y1, METH_O, GMPy_doc_function_y1 },
@@ -522,8 +495,8 @@ static PyMethodDef Pygmpy_methods [] =
     { NULL, NULL, 1}
 };
 
-static char _gmpy_docs[] = "gmpy2 " GMPY_VERSION
-" - General Multiple-precision arithmetic for Python\n"
+static char _gmpy_docs[] =
+"gmpy2 - General Multiple-precision arithmetic for Python\n"
 "\n"
 "gmpy2 supports several multiple-precision libraries. Integer and\n"
 "rational arithmetic is provided by the GMP library. Real floating-\n"
@@ -774,11 +747,23 @@ gmpy_exec(PyObject *gmpy_module)
         return -1;;
         /* LCOV_EXCL_STOP */
     }
-    if (PyModule_AddStringConstant(gmpy_module, "__version__", gmpy_version) < 0) {
-        /* LCOV_EXCL_START */
-        return -1;
-        /* LCOV_EXCL_STOP */
+
+    const char *str = ("import numbers, importlib.metadata as imp\n"
+                       "gmpy2.__version__ = imp.version('gmpy2')\n");
+    PyObject *ns = PyDict_New();
+
+    if (!ns) {
+        return -1; /* LCOV_EXCL_LINE */
     }
+    PyDict_SetItemString(ns, "gmpy2", gmpy_module);
+
+    PyObject *res = PyRun_String(str, Py_file_input, ns, ns);
+
+    Py_DECREF(ns);
+    if (!res) {
+        return -1; /* LCOV_EXCL_LINE */
+    }
+    Py_DECREF(res);
 
     /* Add the exceptions. */
     Py_INCREF(GMPyExc_DivZero);
@@ -944,11 +929,7 @@ static PyModuleDef_Slot Pygmpy_slots[] = {
      Py_MOD_MULTIPLE_INTERPRETERS_NOT_SUPPORTED},
 #  endif
 #  if PY_VERSION_HEX >= 0x030D0000
-#    ifdef MPFR_USE_THREAD_SAFE
-    {Py_mod_gil, Py_MOD_GIL_NOT_USED},
-#    else
     {Py_mod_gil, Py_MOD_GIL_USED},
-#    endif
 #  endif
     {0, NULL}
 };
@@ -969,5 +950,15 @@ static struct PyModuleDef gmpy_module = {
 
 PyMODINIT_FUNC PyInit_gmpy2(void)
 {
+#if PY_VERSION_HEX >= 0x030D0000
+    if (mpfr_buildopt_tls_p()) {
+        for (PyModuleDef_Slot *slot = Pygmpy_slots; slot->slot; slot++) {
+            if (slot->slot == Py_mod_gil) {
+                slot->value = Py_MOD_GIL_NOT_USED;
+                break;
+            }
+        }
+    }
+#endif
     return PyModuleDef_Init(&gmpy_module);
 }

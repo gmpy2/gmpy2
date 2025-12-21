@@ -483,10 +483,6 @@ typedef struct {
 #include "gmpy2_richcompare.h"
 #include "gmpy2_cmp.h"
 
-#ifdef VECTOR
-#  include "gmpy2_vector.h"
-#endif /* defined(VECTOR) */
-
 #else /* defined(GMPY2_MODULE) */
 
 /* This section is used for other C-coded modules that use gmpy2's API. */

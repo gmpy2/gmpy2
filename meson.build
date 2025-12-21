@@ -1,4 +1,6 @@
-project('gmpy2', 'c')
+project('gmpy2', 'c',
+        version: run_command('python', '-m', 'setuptools_scm',
+                             check: true).stdout().strip())
 add_global_arguments('-DSHARED=1', language : 'c')
 py = import('python').find_installation(pure: true)
 libgmp = dependency('gmp', version: '>= 6.2.0')

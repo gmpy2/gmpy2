@@ -171,6 +171,20 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
     return result;
 }
 
+/* Workaround to ignore NaN's signs in the mpfr_asprintf() */
+#define WA_UNAN_ASPRINTF(LEN, BUF, FMT, VAL) \
+    do { \
+        int have_nan = mpfr_nan_p(VAL); \
+        if (have_nan&1) { \
+            have_nan |= (mpfr_signbit(VAL) << 1); \
+            mpfr_setsign(VAL, VAL, 0, ctx_round); \
+        } \
+        LEN = mpfr_asprintf(&BUF, FMT, VAL); \
+        if (have_nan&1) { \
+            mpfr_setsign(VAL, VAL, have_nan&2, MPFR_RNDN); \
+        } \
+    } while (0);
+
 PyDoc_STRVAR(GMPy_doc_mpfr_format,
 "x.__format__(fmt) -> str\n\n"
 "Return a Python string by formatting 'x' using the format string\n"
@@ -343,7 +357,8 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     *(p2) = '\00';
     *(p3) = '\00';
 
-    buflen = mpfr_asprintf(&buffer, mpfrfmt, MPFR(self));
+    WA_UNAN_ASPRINTF(buflen, buffer, mpfrfmt, MPFR(self));
+
     if (buflen == -1) {
         RUNTIME_ERROR("The maximum precision for string formatting "
                       "exceeded. Please use digits() method instead.");
@@ -598,8 +613,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
 
     /* Format the real part.... */
 
-    rbuflen = mpfr_asprintf(&realbuf, rfmt,
-                           mpc_realref(MPC(self)));
+    WA_UNAN_ASPRINTF(rbuflen, realbuf, rfmt, mpc_realref(MPC(self)));
 
     if (rbuflen < 0) {
         mpfr_free_str(realbuf);
@@ -621,8 +635,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
     }
 
-    ibuflen = mpfr_asprintf(&imagbuf, ifmt,
-                           mpc_imagref(MPC(self)));
+    WA_UNAN_ASPRINTF(ibuflen, imagbuf, ifmt, mpc_imagref(MPC(self)));
 
     if (ibuflen < 0) {
         mpfr_free_str(realbuf);

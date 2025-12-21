@@ -288,8 +288,9 @@ GMPy_PyFloat_From_MPZ(MPZ_Object *obj, CTXT_Object *unused)
     PyObject *res = GMPy_PyFloat_From_MPFR(tmp, context);
     Py_DECREF(tmp);
     Py_DECREF(context);
-    if (!res) {
+    if (isinf(PyFloat_AS_DOUBLE(res))) {
         OVERFLOW_ERROR("'mpz' too large to convert to float");
+        Py_CLEAR(res);
     }
     return res;
 }
@@ -932,8 +933,9 @@ GMPy_PyFloat_From_MPQ(MPQ_Object *obj, CTXT_Object *unused)
     PyObject *res = GMPy_PyFloat_From_MPFR(tmp, context);
     Py_DECREF(tmp);
     Py_DECREF(context);
-    if (!res) {
+    if (isinf(PyFloat_AS_DOUBLE(res))) {
         OVERFLOW_ERROR("'mpq' too large to convert to float");
+        Py_CLEAR(res);
     }
     return res;
 }

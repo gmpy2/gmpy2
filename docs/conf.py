@@ -67,6 +67,14 @@ html_theme = 'sphinx_rtd_theme'
 latex_documents = [('index', 'gmpy2.tex', 'gmpy2 Documentation',
                     'Case Van Horsen', 'manual')]
 
+# A dictionary that contains LaTeX snippets overriding those Sphinx
+# usually puts into the generated .tex files.
+latex_elements = {
+    'preamble': r'''
+\DeclareUnicodeCharacter{03B5}{$\epsilon$}
+''',
+}
+
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [('index', 'gmpy2', 'gmpy2 Documentation', ['Case Van Horsen'], 3)]

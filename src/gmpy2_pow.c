@@ -38,10 +38,6 @@
  * currently used but may be used in the future.
  */
 
-/* TODO: refactor to improve performance.
- *   - dont't convert the exponent to an MPZ if there is no modulus
- */
-
 static PyObject *
 GMPy_Integer_PowWithType(PyObject *b, int btype, PyObject *e, int etype,
                          PyObject *m, CTXT_Object *context)

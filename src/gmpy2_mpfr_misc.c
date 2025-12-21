@@ -760,10 +760,6 @@ GMPy_MPFR_Method_Round10(PyObject *self, PyObject *args)
         }
     }
 
-    /* TODO: better error analysis, or else convert the mpfr to an exact
-     * fraction, round the fraction, and then convert back to an mpfr.
-     */
-
     if (!(resultf = GMPy_MPFR_New(mpfr_get_prec(MPFR(self))+100, context))) {
         return NULL;
     }

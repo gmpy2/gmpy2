@@ -1,10 +1,10 @@
 [build-system]
 build-backend = "mesonpy"
-requires = ["meson-python"]
+requires = ["meson-python", 'setuptools_scm[toml]>=6.0']
 
 [project]
 name = 'gmpy2'
-version = '2.3.0a2'
+dynamic = ["version"]
 description = 'gmpy2 interface to GMP, MPFR, and MPC for Python'
 keywords = ['gmp', 'mpfr', 'mpc', 'multiple-precision',
             'arbitrary-precision', 'precision', 'bignum']
@@ -47,6 +47,8 @@ tests = ['pytest', 'hypothesis', 'cython', 'mpmath', 'setuptools',
 [project.urls]
 Homepage = 'https://github.com/gmpy2/gmpy2'
 
+[tool.setuptools_scm]
+
 [tool.pytest.ini_options]
 addopts = "--durations=10"
 norecursedirs = ['build', '.eggs', '.git', '.hypothesis']
@@ -55,8 +57,6 @@ xfail_strict = true
 [tool.cibuildwheel]
 build-frontend = {name="build", args=["--verbose"]}
 enable = "pypy cpython-prerelease cpython-freethreading"
-skip = """*-win32 *-manylinux_i686 *-musllinux_* \
-          *-manylinux_armv7l pp*aarch64*"""
 before-all = "bash scripts/cibw_before_all.sh"
 test-extras = "tests"
 #test-command = """pytest {package}/test && \
@@ -74,6 +74,7 @@ PYTEST_ADDOPTS = "--verbose"
 #CFLAGS = "-Wall -Wpedantic -Werror -std=c17"
 
 [tool.cibuildwheel.windows]
+archs = ["auto64"]
 before-all = "msys2 -c scripts/cibw_before_all.sh"
 before-build = "pip install wheel delvewheel"
 repair-wheel-command = """delvewheel repair -w {dest_dir} {wheel} \

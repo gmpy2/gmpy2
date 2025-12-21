@@ -109,8 +109,10 @@ def test_mpfr_conversion():
     assert xmpz(mpfr(5.51)) == xmpz(6)
 
     pytest.raises(OverflowError, lambda: mpq(mpfr('inf')))
-    pytest.raises(OverflowError, lambda: float(mpfr('inf')))
-    pytest.raises(OverflowError, lambda: float(mpfr('1e+400')))
+
+    assert float(mpfr('inf')) == float('inf')
+    assert float(mpfr('-inf')) == float('-inf')
+    assert float(mpfr('1e+400')) == float('inf')
 
     assert mpq(mpfr(4.5)) == mpq(9,2)
     assert mpq(mpfr(0)) == mpq(0,1)
@@ -952,3 +954,11 @@ def test_mpfr_thread_safe():
     tpe = ThreadPoolExecutor(max_workers=20)
     for _ in range(1000):
         tpe.submit(worker)
+
+
+def test_issue_650():
+    x = -mpfr('nan')
+
+    assert gmpy2.copy_sign(mpfr(1), x) == -1
+    assert str(x) == 'nan'
+    assert gmpy2.copy_sign(mpfr(1), x) == -1

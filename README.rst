@@ -14,6 +14,16 @@ Version 2.3 (development)
 * Fix round(mpz, ndigits) if ndigits is negative.
 * Improved support for mixed `mpfr` and `mpc` arithmetic.
 
+gmpy2 2.2.2
+-----------
+
+* Fix memory leak for mpfr/mpc cache, see issue 511.
+* Fix memory leak in GMPy_CTXT_Exit(), see issue 515.
+* Restore 'm' in library list, see issue 538.
+* Adjust to_bytes() behavior to match CPython.
+* Provide wheels for CPython v3.14.
+* Provide wheels for Linux and Windows ARM64.
+
 gmpy2 2.2.1
 -----------
 

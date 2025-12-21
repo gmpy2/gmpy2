@@ -43,7 +43,16 @@ PyDoc_STRVAR(GMPy_doc_version,
 static PyObject *
 GMPy_get_version(PyObject *self, PyObject *args)
 {
-    return PyUnicode_FromString(gmpy_version);
+    PyObject *gmpy2 = PyImport_ImportModule("gmpy2");
+
+    if (!gmpy2) {
+        return NULL; /* LCOV_EXCL_LINE */
+    }
+
+    PyObject *version = PyObject_GetAttrString(gmpy2, "__version__");
+
+    Py_DECREF(gmpy2);
+    return version;
 }
 
 PyDoc_STRVAR(GMPy_doc_mp_version,

@@ -14,16 +14,15 @@ Changes in gmpy2 2.3.0
 * Add missing methods to `mpz` and `mpq`.  (skirpichev)
 * Fix round(mpz, ndigits) if ndigits is negative.  (skirpichev)
 
-Changes in gmpy2 2.2.2 (released as 2.3.0)
-------------------------------------------
+Changes in gmpy2 2.2.2
+----------------------
 
-* Preliminary support for free-threaded builds.  (skirpichev)
-* Fix behavior and memory leaks for contexts.  (skirpichev)
-* Fix memory leaks for `mpfr` caching.  (skirpichev)
-* Fix rounding error in float(mpz).  (skirpichev)
-* Add missing methods to `mpz` and `mpq`.  (skirpichev)
-* Fix round(mpz, ndigits) if ndigits is negative.  (skirpichev)
-* Improved support for mixed `mpfr` and `mpc` arithmetic.  (skirpichev)
+* Fix memory leak for mpfr/mpc cache, see issue 511.
+* Fix memory leak in GMPy_CTXT_Exit(), see issue 515.
+* Restore 'm' in library list, see issue 538.
+* Adjust to_bytes() behavior to match CPython.
+* Provide wheels for CPython v3.14.
+* Provide wheels for Linux and Windows ARM64.
 
 Changes in gmpy2 2.2.1
 ----------------------

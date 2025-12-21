@@ -185,7 +185,7 @@ static PyObject *
 GMPy_CTXT_Exit(PyObject *self, PyObject *args)
 {
     CTXT_Object *ctx = (CTXT_Object*)self;
-    int res = (int)PyContextVar_Reset(current_context_var, ctx->token);  // XXX: pypy/pypy#5252
+    int res = PyContextVar_Reset(current_context_var, ctx->token);
     Py_DECREF(ctx->token);
     if (res == -1) {
         SYSTEM_ERROR("Unexpected failure in restoring context.");
@@ -200,7 +200,7 @@ PyDoc_STRVAR(GMPy_doc_context_ieee,
 "Return a new context corresponding to a standard IEEE floating-point\n"
 "format. The supported sizes are 16, 32, 64, 128, and multiples of\n"
 "32 greater than 128.\n\n"
-"Note that emax/emin attributes of the IEEE contexts have\n"
+"Note that `context.emax`/`context.emin` of the IEEE contexts have\n"
 "different meaning wrt the IEEE 754 standard: emax = e + 1 and\n"
 "emin = 4 - emax - precision, where e - maximum exponent\n"
 "in IEEE terms.");
@@ -1010,7 +1010,8 @@ GMPy_CTXT_Set_imag_round(CTXT_Object *self, PyObject *value, void *closure)
 
 PyDoc_STRVAR(GMPy_doc_CTXT_emin,
 "This attribute controls the minimum allowed exponent of an `mpfr`\n"
-"result.  The minimum exponent is platform dependent and can be\n"
+"result, the smallest positive value of a floating-point variable is\n"
+"0.5*2**emin.  The minimum exponent is platform dependent and can be\n"
 "retrieved with `get_emin_min()`.");
 
 static PyObject *
@@ -1043,7 +1044,9 @@ GMPy_CTXT_Set_emin(CTXT_Object *self, PyObject *value, void *closure)
 
 PyDoc_STRVAR(GMPy_doc_CTXT_emax,
 "This attribute controls the maximum allowed exponent of an `mpfr`\n"
-"result.  The maximum exponent is platform dependent and can be\n"
+"result, the largest positive value of floating-point variable is\n"
+"(1 - ε)*2**emax, where ε depends on precision of the variable.\n"
+"The maximum exponent is platform dependent and can be\n"
 "retrieved with `get_emax_max()`.");
 
 static PyObject *
@@ -1224,10 +1227,6 @@ static PyMethodDef GMPyContext_methods[] =
     { "tan", GMPy_Context_Tan, METH_O, GMPy_doc_context_tan },
     { "tanh", GMPy_Context_Tanh, METH_O, GMPy_doc_context_tanh },
     { "trunc", GMPy_Context_Trunc, METH_O, GMPy_doc_context_trunc },
-#ifdef VECTOR
-    { "vector", GMPy_Context_Vector, METH_O, GMPy_doc_context_vector },
-    { "vector2", GMPy_Context_Vector2, METH_VARARGS, GMPy_doc_context_vector2 },
-#endif
     { "yn", GMPy_Context_Yn, METH_VARARGS, GMPy_doc_context_yn },
     { "y0", GMPy_Context_Y0, METH_O, GMPy_doc_context_y0 },
     { "y1", GMPy_Context_Y1, METH_O, GMPy_doc_context_y1 },
