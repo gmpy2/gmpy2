@@ -73,11 +73,15 @@ jobs:
     - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: >-
-        gh release create '${{ github.ref_name }}'
-        --repo '${{ github.repository }}'
-        --prerelease
-        --generate-notes
+      run: |
+        PRERELEASE_FLAG=""
+        if [[ "${{ github.ref_name }}" =~ [ab][0-9] ]]
+        then
+          PRERELEASE_FLAG="--prerelease"
+        fi
+        gh release create '${{ github.ref_name }}' \
+          --repo '${{ github.repository }}' ${PRERELEASE_FLAG} \
+          --generate-notes
     - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
