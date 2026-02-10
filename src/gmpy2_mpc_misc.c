@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -25,11 +25,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 PyDoc_STRVAR(GMPy_doc_context_phase,
-"context.phase(x, /) -> mpfr\n\n"
+"phase($self, x, /)\n--\n\n"
 "Return the phase angle, also known as argument, of a complex x.");
 
 PyDoc_STRVAR(GMPy_doc_function_phase,
-"phase(x, /) -> mpfr\n\n"
+"phase($module, x, /)\n--\n\n"
 "Return the phase angle, also known as argument, of a complex x.");
 
 static PyObject *
@@ -78,11 +78,11 @@ GMPy_Context_Phase(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_root_of_unity,
-"context.root_of_unity(n, k, /) -> mpc\n\n"
+"root_of_unity($self, n, k, /)\n--\n\n"
 "Return the n-th root of mpc(1) raised to the k-th power..");
 
 PyDoc_STRVAR(GMPy_doc_function_root_of_unity,
-"root_of_unity(n, k, /) -> mpc\n\n"
+"root_of_unity($module, n, k, /)\n--\n\n"
 "Return the n-th root of mpc(1) raised to the k-th power..");
 
 static PyObject *
@@ -144,12 +144,12 @@ GMPy_Context_Root_Of_Unity(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_norm,
-"context.norm(x, /) -> mpfr\n\n"
+"norm($self, x, /)\n--\n\n"
 "Return the norm of a complex x. The norm(x) is defined as\n"
 "x.real**2 + x.imag**2. abs(x) is the square root of norm(x).\n");
 
 PyDoc_STRVAR(GMPy_doc_function_norm,
-"norm(x, /) -> mpfr\n\n"
+"norm($module, x, /)\n--\n\n"
 "Return the norm of a complex x. The norm(x) is defined as\n"
 "x.real**2 + x.imag**2. abs(x) is the square root of norm(x).\n");
 
@@ -199,12 +199,12 @@ GMPy_Context_Norm(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_polar,
-"context.polar(x, /) -> tuple[mpfr, mpfr]\n\n"
+"polar($self, x, /)\n--\n\n"
 "Return the polar coordinate form of a complex x that is in\n"
 "rectangular form.");
 
 PyDoc_STRVAR(GMPy_doc_function_polar,
-"polar(x, /) -> tuple[mpfr, mpfr]\n\n"
+"polar($module, x, /)\n--\n\n"
 "Return the polar coordinate form of a complex x that is in\n"
 "rectangular form.");
 
@@ -256,12 +256,12 @@ GMPy_Context_Polar(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_rect,
-"context.rect(r, phi, /) -> mpc\n\n"
+"rect($self, r, phi, /)\n--\n\n"
 "Return the rectangular coordinate form of a complex number that is\n"
 "given in polar form.");
 
 PyDoc_STRVAR(GMPy_doc_function_rect,
-"rect(r, phi, /) -> mpc\n\n"
+"rect($module, r, phi, /)\n--\n\n"
 "Return the rectangular coordinate form of a complex number that is\n"
 "given in polar form.");
 
@@ -325,11 +325,11 @@ GMPy_Context_Rect(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_proj,
-"context.proj(x, /) -> mpc\n\n"
+"proj($self, x, /)\n--\n\n"
 "Returns the projection of a complex x on to the Riemann sphere.");
 
 PyDoc_STRVAR(GMPy_doc_function_proj,
-"proj(x, /) -> mpc\n\n"
+"proj($module, x, /)\n--\n\n"
 "Returns the projection of a complex x on to the Riemann sphere.");
 
 static PyObject *
@@ -378,8 +378,8 @@ GMPy_Context_Proj(PyObject *self, PyObject *other)
 /* Implement the conjugate() method. */
 
 PyDoc_STRVAR(GMPy_doc_mpc_conjugate_method,
-"x.conjugate() -> mpc\n\n"
-"Returns the conjugate of x.");
+"conjugate($self)\n--\n\n"
+"Returns the conjugate of self.");
 
 static PyObject *
 GMPy_MPC_Conjugate_Method(PyObject *self, PyObject *args)
@@ -465,8 +465,8 @@ GMPy_MPC_NonZero_Slot(MPC_Object *self)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpc_sizeof_method,
-"x.__sizeof__()\n\n"
-"Returns the amount of memory consumed by x.");
+"__sizeof__($self)\n--\n\n"
+"Returns the amount of memory consumed by self.");
 
 static PyObject *
 GMPy_MPC_SizeOf_Method(PyObject *self, PyObject *other)

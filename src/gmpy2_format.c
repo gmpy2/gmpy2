@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -25,27 +25,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 PyDoc_STRVAR(GMPy_doc_mpz_format,
-"x.__format__(fmt) -> str\n\n"
-"Return a Python string by formatting `mpz` 'x' using the format string\n"
-"'fmt'. A valid format string consists of:\n\n"
-"     optional alignment code:\n\n"
-"        '<' -> left shifted in field\n"
-"        '>' -> right shifted in field\n"
-"        '^' -> centered in field\n\n"
-"     optional leading sign code:\n\n"
-"        '+' -> always display leading sign\n"
-"        '-' -> only display minus sign\n"
-"        ' ' -> minus for negative values, space for positive values\n\n"
-"     optional base indicator\n\n"
-"        '#' -> precede binary, octal, or hex with 0b, 0o or 0x\n\n"
-"     optional width\n\n"
-"     optional conversion code:\n\n"
-"        'd' -> decimal format\n"
-"        'b' -> binary format\n"
-"        'o' -> octal format\n"
-"        'x' -> hex format\n"
-"        'X' -> upper-case hex format\n\n"
-"The default format is 'd'.");
+"__format__($self, fmt, /)\n--\n\n"
+"Return a Python string by formatting self using the format string 'fmt'.\n\n"
+"Same as for built-in `int`'s, except that for floating-point\n"
+"format types, `mpfr` is used to convert the integer to a floating-point\n"
+"number before formatting.");
 
 /* Formatting occurs in two phases. Pympz_ascii() is used to create a string
  * with the appropriate binary/octal/decimal/hex formatting, including the
@@ -158,8 +142,15 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
             base = -16;
             break;
         }
-        VALUE_ERROR("Invalid conversion specification");
-        return NULL;
+
+        MPFR_Object *tmp = NULL;
+
+        if (!(tmp = GMPy_MPFR_From_MPZ((MPZ_Object *)self, 0, NULL))) {
+            return NULL; /* LCOV_EXCL_LINE */
+        }
+        result = GMPy_MPFR_Format((PyObject *)tmp, args);
+        Py_DECREF(tmp);
+        return result;
     }
     *(p2++) = '\00';
 
@@ -171,32 +162,39 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
     return result;
 }
 
+/* Workaround to ignore NaN's signs in the mpfr_asprintf() */
+#define WA_UNAN_ASPRINTF(LEN, BUF, FMT, VAL) \
+    do { \
+        int have_nan = mpfr_nan_p(VAL); \
+        if (have_nan&1) { \
+            have_nan |= (mpfr_signbit(VAL) << 1); \
+            mpfr_setsign(VAL, VAL, 0, ctx_round); \
+        } \
+        LEN = mpfr_asprintf(&BUF, FMT, VAL); \
+        if (have_nan&1) { \
+            mpfr_setsign(VAL, VAL, have_nan&2, MPFR_RNDN); \
+        } \
+    } while (0);
+
 PyDoc_STRVAR(GMPy_doc_mpfr_format,
-"x.__format__(fmt) -> str\n\n"
-"Return a Python string by formatting 'x' using the format string\n"
-"'fmt'. A valid format string consists of:\n\n"
-"     optional alignment code:\n\n"
-"        '<' -> left shifted in field\n"
-"        '>' -> right shifted in field\n"
-"        '^' -> centered in field\n\n"
-"     optional leading sign code\n\n"
-"        '+' -> always display leading sign\n"
-"        '-' -> only display minus for negative values\n"
-"        ' ' -> minus for negative values, space for positive values\n\n"
-"     optional width.precision\n\n"
-"     optional rounding mode:\n\n"
-"        'U' -> round toward plus Infinity\n"
-"        'D' -> round toward minus Infinity\n"
-"        'Y' -> round away from zero\n"
-"        'Z' -> round toward zero\n"
-"        'N' -> round to nearest\n\n"
-"     optional conversion code:\n\n"
-"        'a','A' -> hex format\n"
-"        'b'     -> binary format\n"
-"        'e','E' -> scientific format\n"
-"        'f','F' -> fixed point format\n"
-"        'g','G' -> fixed or float format\n\n"
-"The default format is '.6f'.");
+"__format__($self, fmt, /)\n--\n\n"
+"Return a Python string by formatting self using the format string 'fmt'.\n\n"
+"The format specification adopts the same general form as Python's\n"
+"Format Specification Mini-Language.  All of Python's format types are\n"
+"supported, with the exception of 'n'.  Format types 'a' and 'A' (use\n"
+"uppercase digits) allow to represent floating-point number as a\n"
+"C99-style hexadecimal string.  Format type 'b' allows format\n"
+"number in binary.\n\n"
+"Five rounding modes are supported, as for `context.round`:\n\n"
+"    * 'U': rounding towards plus infinity\n"
+"    * 'D': rounding towards minus infinity\n"
+"    * 'Y': rounding away from zero\n"
+"    * 'Z': rounding towards zero\n"
+"    * 'N': rounding to nearest\n\n"
+"The rounding option must be set right before the presentation type.\n"
+"If it's not specified, the context's rounding mode is used.\n\n"
+"The default format is like str(self) output, as altered by the other\n"
+"format modifiers.");
 
 static PyObject *
 GMPy_MPFR_Format(PyObject *self, PyObject *args)
@@ -207,7 +205,12 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     char mpfrfmt[100], fmt[30];
     int buflen;
     int seensign = 0, seenalign = 0, seendecimal = 0, seendigits = 0;
-    int seenround = 0, seenconv = 0;
+    int seenround = 0, seenconv = 0, seenindicator = 0;
+    CTXT_Object *context = NULL;
+    mpfr_rnd_t ctx_round;
+
+    CHECK_CONTEXT(context);
+    ctx_round = GET_MPFR_ROUND(context);
 
     if (!MPFR_Check(self)) {
         TYPE_ERROR("requires mpfr type");
@@ -223,7 +226,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
 
     for (p1 = (unsigned char*)fmtcode; *p1 != '\00'; p1++) {
         if (*p1 == '<' || *p1 == '>' || *p1 == '^') {
-            if (seenalign || seensign || seendecimal || seendigits || seenround) {
+            if (seenalign || seensign || seendecimal || seendigits || seenround || seenindicator) {
                 VALUE_ERROR("Invalid conversion specification");
                 return NULL;
             }
@@ -234,7 +237,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
             }
         }
         if (*p1 == '+' || *p1 == ' ') {
-            if (seensign || seendecimal || seendigits || seenround) {
+            if (seensign || seendecimal || seendigits || seenround || seenindicator) {
                 VALUE_ERROR("Invalid conversion specification");
                 return NULL;
             }
@@ -245,12 +248,23 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
             }
         }
         if (*p1 == '-') {
-            if (seensign || seendecimal || seendigits || seenround) {
+            if (seensign || seendecimal || seendigits || seenround || seenindicator) {
                 VALUE_ERROR("Invalid conversion specification");
                 return NULL;
             }
             else {
                 seensign = 1;
+                continue;
+            }
+        }
+        if (*p1 == '#') {
+            if (seenindicator || seendigits) {
+                VALUE_ERROR("Invalid conversion specification");
+                return NULL;
+            }
+            else {
+                *(p2++) = *p1;
+                seenindicator = 1;
                 continue;
             }
         }
@@ -285,6 +299,25 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (!seendigits) {
             seendigits = 1;
+            if ((*p1 == 'e' || *p1 == 'E')
+                || ((*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
+                     *p1 == 'N') && (*(p1+1) == 'e' || *(p1+1) == 'E')))
+            {
+                *(p2++) = '.';
+                *(p2++) = '6';
+            }
+            if ((*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
+                 *p1 == 'N') && *(p1+1) == '\00')
+            {
+                long precision = (long)(log10(2) * (double)mpfr_get_prec(MPFR(self))) + 2;
+                char tmp[23];
+
+                *(p2++) = '.';
+                sprintf(tmp, "%ld", precision);
+                for (char *c = tmp; *c != '\00'; c++) {
+                    *(p2++) = *c;
+                }
+            }
             *(p2++) = 'R';
         }
         if (*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
@@ -301,7 +334,27 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == 'a' || *p1 == 'A' || *p1 == 'b' || *p1 == 'e' ||
             *p1 == 'E' || *p1 == 'f' || *p1 == 'F' || *p1 == 'g' ||
-            *p1 == 'G' ) {
+            *p1 == 'G' || *p1 == '%' ) {
+            if (!seenround) {
+                switch (ctx_round) {
+                    case MPFR_RNDD:
+                        *(p2++) = 'D';
+                        break;
+                    case MPFR_RNDU:
+                        *(p2++) = 'U';
+                        break;
+                    case MPFR_RNDZ:
+                        *(p2++) = 'Z';
+                        break;
+                    case MPFR_RNDA:
+                        *(p2++) = 'Y';
+                        break;
+                    case MPFR_RNDN:
+                    default:
+                        *(p2++) = 'N';
+                        break;
+                }
+            }
             *(p2++) = *p1;
             seenconv = 1;
             break;
@@ -310,15 +363,43 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    if (!seendigits)
+    if (!seendigits) {
+        long precision = (long)(log10(2) * (double)mpfr_get_prec(MPFR(self))) + 2;
+        char tmp[23];
+
+        *(p2++) = '.';
+        sprintf(tmp, "%ld", precision);
+        for (char *c = tmp; *c != '\00'; c++) {
+            *(p2++) = *c;
+        }
         *(p2++) = 'R';
-    if (!seenconv)
-        *(p2++) = 'f';
+    }
+    if (!seenconv) {
+        *(p2++) = 'g';
+    }
+
+    if (seenconv && *(p2 - 1) == '%') {
+        *(p2 - 1) = 'f';
+        *p2 = '%';
+        *(p2++) = '%';
+    }
 
     *(p2) = '\00';
     *(p3) = '\00';
 
-    buflen = mpfr_asprintf(&buffer, mpfrfmt, MPFR(self));
+    if (seenconv && *(p2 - 1) == '%') {
+        mpfr_t tmp;
+
+        mpfr_init2(tmp, mpfr_get_prec(MPFR(self)));
+        mpfr_set(tmp, MPFR(self), ctx_round);
+        mpfr_mul_ui(tmp, tmp, 100, ctx_round);
+        WA_UNAN_ASPRINTF(buflen, buffer, mpfrfmt, tmp);
+        mpfr_clear(tmp);
+    }
+    else {
+        WA_UNAN_ASPRINTF(buflen, buffer, mpfrfmt, MPFR(self));
+    }
+
     if (buflen == -1) {
         RUNTIME_ERROR("The maximum precision for string formatting "
                       "exceeded. Please use digits() method instead.");
@@ -354,33 +435,10 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpc_format,
-"x.__format__(fmt) -> str\n\n"
-"Return a Python string by formatting 'x' using the format string\n"
-"'fmt'. A valid format string consists of:\n\n"
-"     optional alignment code:\n\n"
-"        '<' -> left shifted in field\n"
-"        '>' -> right shifted in field\n"
-"        '^' -> centered in field\n\n"
-"     optional leading sign code\n\n"
-"        '+' -> always display leading sign\n"
-"        '-' -> only display minus for negative values\n"
-"        ' ' -> minus for negative values, space for positive values\n\n"
-"     optional width.real_precision.imag_precision\n\n"
-"     optional rounding mode:\n\n"
-"        'U' -> round toward plus infinity\n"
-"        'D' -> round toward minus infinity\n"
-"        'Z' -> round toward zero\n"
-"        'N' -> round to nearest\n\n"
-"     optional output style:\n\n"
-"        'P' -> Python style, 1+2j, (default)\n"
-"        'M' -> MPC style, (1 2)\n\n"
-"     optional conversion code:\n\n"
-"        'a','A' -> hex format\n"
-"        'b'     -> binary format\n"
-"        'e','E' -> scientific format\n"
-"        'f','F' -> fixed point format\n"
-"        'g','G' -> fixed or scientific format\n\n"
-"The default format is 'f'.");
+"__format__($self, fmt, /)\n--\n\n"
+"Return a Python string by formatting self using the format string 'fmt'.\n\n"
+"All of `mpfr`'s format types and options are supported, with the exception\n"
+"of '%' format type, '=' alignment and zero padding.");
 
 static PyObject *
 GMPy_MPC_Format(PyObject *self, PyObject *args)
@@ -393,6 +451,12 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
     int rbuflen, ibuflen;
     int seensign = 0, seenalign = 0, seendecimal = 0, seendigits = 0;
     int seenround = 0, seenconv = 0, seenstyle = 0, mpcstyle = 0;
+    int seenindicator = 0;
+    CTXT_Object *context = NULL;
+    mpfr_rnd_t ctx_round;
+
+    CHECK_CONTEXT(context);
+    ctx_round = GET_MPFR_ROUND(context);
 
     if (!MPC_Check(self)) {
         TYPE_ERROR("requires 'mpc' object");
@@ -412,7 +476,8 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
     for (p = (unsigned char*)fmtcode; *p != '\00'; p++) {
         if (*p == '<' || *p == '>' || *p == '^') {
             if (seenalign || seensign || seendecimal || seendigits ||
-                seenround || seenstyle) {
+                seenround || seenstyle || seenindicator)
+            {
                 VALUE_ERROR("Invalid conversion specification");
                 return NULL;
             }
@@ -424,7 +489,8 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (*p == '+' || *p == ' ' || *p == '-') {
             if (seensign || seendecimal || seendigits || seenround ||
-                seenstyle) {
+                seenstyle || seenindicator)
+            {
                 VALUE_ERROR("Invalid conversion specification");
                 return NULL;
             }
@@ -439,6 +505,18 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
             *(rfmtptr++) = '-';
             *(ifmtptr++) = '-';
             seensign = 1;
+        }
+        if (*p == '#') {
+            if (seenindicator || seendigits) {
+                VALUE_ERROR("Invalid conversion specification");
+                return NULL;
+            }
+            else {
+                *(rfmtptr++) = *p;
+                *(ifmtptr++) = *p;
+                seenindicator = 1;
+                continue;
+            }
         }
         if (*p == '.') {
             if (seendecimal == 2 || seendigits || seenround || seenstyle) {
@@ -483,6 +561,33 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (!seendigits) {
             seendigits = 1;
+            if ((*p == 'e' || *p == 'E')
+                || ((*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
+                     *p == 'N') && (*(p+1) == 'e' || *(p+1) == 'E')))
+            {
+                *(rfmtptr++) = '.';
+                *(rfmtptr++) = '6';
+                *(ifmtptr++) = '.';
+                *(ifmtptr++) = '6';
+            }
+            if ((*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
+                 *p == 'N') && *(p+1) == '\00')
+            {
+                long precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_realref(MPC(self)))) + 2;
+                char tmp[23];
+
+                *(rfmtptr++) = '.';
+                sprintf(tmp, "%ld", precision);
+                for (char *c = tmp; *c != '\00'; c++) {
+                    *(rfmtptr++) = *c;
+                }
+                precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_imagref(MPC(self)))) + 2;
+                *(ifmtptr++) = '.';
+                sprintf(tmp, "%ld", precision);
+                for (char *c = tmp; *c != '\00'; c++) {
+                    *(ifmtptr++) = *c;
+                }
+            }
             *(rfmtptr++) = 'R';
             *(ifmtptr++) = 'R';
         }
@@ -514,6 +619,32 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         if (*p == 'a' || *p == 'A' || *p == 'b' || *p == 'e' ||
             *p == 'E' || *p == 'f' || *p == 'F' || *p == 'g' ||
             *p == 'G' ) {
+            if (!seenround) {
+                switch (ctx_round) {
+                    case MPFR_RNDD:
+                        *(rfmtptr++) = 'D';
+                        *(ifmtptr++) = 'D';
+                        break;
+                    case MPFR_RNDU:
+                        *(rfmtptr++) = 'U';
+                        *(ifmtptr++) = 'U';
+                        break;
+                    case MPFR_RNDZ:
+                        *(rfmtptr++) = 'Z';
+                        *(ifmtptr++) = 'Z';
+                        break;
+                    case MPFR_RNDA:
+                        *(rfmtptr++) = 'Y';
+                        *(ifmtptr++) = 'Y';
+                        break;
+                    case MPFR_RNDN:
+                    default:
+                        *(rfmtptr++) = 'N';
+                        *(ifmtptr++) = 'N';
+                        break;
+                }
+            }
+
             *(rfmtptr++) = *p;
             *(ifmtptr++) = *p;
             seenconv = 1;
@@ -528,12 +659,26 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         *(ifmtptr++) = '-';
     }
     if (!seendigits) {
+        long precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_realref(MPC(self)))) + 2;
+        char tmp[23];
+
+        *(rfmtptr++) = '.';
+        sprintf(tmp, "%ld", precision);
+        for (char *c = tmp; *c != '\00'; c++) {
+            *(rfmtptr++) = *c;
+        }
         *(rfmtptr++) = 'R';
+        precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_imagref(MPC(self)))) + 2;
+        *(ifmtptr++) = '.';
+        sprintf(tmp, "%ld", precision);
+        for (char *c = tmp; *c != '\00'; c++) {
+            *(ifmtptr++) = *c;
+        }
         *(ifmtptr++) = 'R';
     }
     if (!seenconv) {
-        *(rfmtptr++) = 'f';
-        *(ifmtptr++) = 'f';
+        *(rfmtptr++) = 'g';
+        *(ifmtptr++) = 'g';
     }
 
     *(rfmtptr) = '\00';
@@ -542,8 +687,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
 
     /* Format the real part.... */
 
-    rbuflen = mpfr_asprintf(&realbuf, rfmt,
-                           mpc_realref(MPC(self)));
+    WA_UNAN_ASPRINTF(rbuflen, realbuf, rfmt, mpc_realref(MPC(self)));
 
     if (rbuflen < 0) {
         mpfr_free_str(realbuf);
@@ -565,8 +709,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
     }
 
-    ibuflen = mpfr_asprintf(&imagbuf, ifmt,
-                           mpc_imagref(MPC(self)));
+    WA_UNAN_ASPRINTF(ibuflen, imagbuf, ifmt, mpc_imagref(MPC(self)));
 
     if (ibuflen < 0) {
         mpfr_free_str(realbuf);
@@ -637,10 +780,9 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
 
 /* produce digits for an mpz in requested base, default 10 */
 PyDoc_STRVAR(GMPy_doc_mpz_digits_method,
-"x.digits(base=10, /) -> str\n\n"
-"Return Python string representing x in the given base. Values for\n"
-"base can range between 2 to 62. A leading '-' is present if x<0\n"
-"but no leading '+' is present if x>=0.");
+"digits($self, base=10, /)\n--\n\n"
+"Return Python string representing self in the given base. Values for\n"
+"base can range between 2 to 62. A leading '-' is present for negatives");
 
 static PyObject *
 GMPy_MPZ_Digits_Method(PyObject *self, PyObject *args)
@@ -667,10 +809,9 @@ GMPy_XMPZ_Digits_Method(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpq_digits_method,
-"x.digits(base=10, /) -> str\n\n"
-"Return a Python string representing x in the given base (2 to 62,\n"
-"default is 10). A leading '-' is present if x<0, but no leading '+'\n"
-"is present if x>=0.\n");
+"digits($self, base=10, /)\n--\n\n"
+"Return a Python string representing self in the given base (2 to 62,\n"
+"default is 10). A leading '-' is present for negatives.");
 
 static PyObject *
 GMPy_MPQ_Digits_Method(PyObject *self, PyObject *args)
@@ -686,10 +827,10 @@ GMPy_MPQ_Digits_Method(PyObject *self, PyObject *args)
 
 
 PyDoc_STRVAR(GMPy_doc_mpfr_digits_method,
-"x.digits(base=10, prec=0, /) -> tuple[str, int, int]\n\n"
+"digits($self, base=10, prec=0, /)\n--\n\n"
 "Returns up to 'prec' digits in the given base. If 'prec' is 0, as many\n"
 "digits that are available are returned. No more digits than available\n"
-"given x's precision are returned. 'base' must be between 2 and 62,\n"
+"given self's precision are returned. 'base' must be between 2 and 62,\n"
 "inclusive. The result is a three element `tuple` containing the mantissa,\n"
 "the exponent, and the number of bits of precision.");
 
@@ -706,9 +847,9 @@ GMPy_MPFR_Digits_Method(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpc_digits_method,
-"c.digits(base=10, prec=0, /) -> tuple[tuple[str, int, int], tuple[str, int, int]]\n\n"
+"digits($self, base=10, prec=0, /)\n--\n\n"
 "Returns up to 'prec' digits in the given base. If 'prec' is 0, as many\n"
-"digits that are available given c's precision are returned. 'base' must\n"
+"digits that are available given self's precision are returned. 'base' must\n"
 "be between 2 and 62. The result consists of 2 three-element tuples that\n"
 "contain the mantissa, exponent, and number of bits of precision of the\n"
 "real and imaginary components.");
@@ -726,8 +867,8 @@ GMPy_MPC_Digits_Method(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_digits,
-"digits(x, base=10, prec=0, /) -> str | tuple\n\n"
-"Return string representing a number x.");
+"digits($module, x, base=10, prec=0, /)\n--\n\n"
+"Return string representing a number.");
 
 static PyObject *
 GMPy_Context_Digits(PyObject *self, PyObject *args)

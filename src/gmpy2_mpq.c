@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -87,6 +87,8 @@ static PyMethodDef GMPy_MPQ_methods [] =
     { "as_integer_ratio", GMPy_MPQ_Method_As_Integer_Ratio, METH_NOARGS, GMPy_doc_mpq_method_as_integer_ratio },
     { "from_float", (PyCFunction)GMPy_MPQ_Method_From_As_Integer_Ratio, METH_FASTCALL | METH_CLASS, GMPy_doc_mpq_method_from_float },
     { "from_decimal", (PyCFunction)GMPy_MPQ_Method_From_As_Integer_Ratio, METH_FASTCALL | METH_CLASS, GMPy_doc_mpq_method_from_decimal },
+    { "is_integer", GMPy_MPQ_Method_IsInteger, METH_NOARGS, GMPy_doc_mpq_method_is_integer },
+    { "limit_denominator", (PyCFunction)GMPy_MPQ_Method_Limit_Denominator, METH_FASTCALL | METH_KEYWORDS, GMPy_doc_mpq_method_limit_denominator },
     { NULL }
 };
 

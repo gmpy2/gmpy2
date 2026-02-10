@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -36,10 +36,6 @@
  * first two arguments are integers, but not necessarily mpz. The third
  * argument must either be an integer or Py_None. The context argument is not
  * currently used but may be used in the future.
- */
-
-/* TODO: refactor to improve performance.
- *   - dont't convert the exponent to an MPZ if there is no modulus
  */
 
 static PyObject *
@@ -272,7 +268,7 @@ GMPy_Integer_PowModBaseListWithType(PyObject *base_lst,
 }
 
 PyDoc_STRVAR(GMPy_doc_integer_powmod_base_list,
-"powmod_base_list(base_lst, exp, mod, /) -> list[mpz, ...]\n\n"
+"powmod_base_list($module, base_lst, exp, mod, /)\n--\n\n"
 "Returns list(powmod(i, exp, mod) for i in base_lst). Will always release\n"
 "the GIL. (Experimental in gmpy2 2.1.x).");
 
@@ -375,7 +371,7 @@ GMPy_Integer_PowModExpListWithType(PyObject *b, int btype,
 }
 
 PyDoc_STRVAR(GMPy_doc_integer_powmod_exp_list,
-"powmod_exp_list(base, exp_lst, mod, /) -> list[mpz, ...]\n\n"
+"powmod_exp_list($module, base, exp_lst, mod, /)\n--\n\n"
 "Returns list(powmod(base, i, mod) for i in exp_lst). Will always release\n"
 "the GIL. (Experimental in gmpy2 2.1.x).");
 
@@ -642,7 +638,7 @@ GMPy_Complex_PowWithType(PyObject *base, int btype, PyObject *exp, int etype,
 }
 
 PyDoc_STRVAR(GMPy_doc_integer_powmod,
-"powmod(x, y, m, /) -> mpz\n\n"
+"powmod($module, x, y, m, /)\n--\n\n"
 "Return (x**y) mod m. Same as the three argument version of Python's\n"
 "built-in `pow`, but converts all three arguments to `mpz`.");
 
@@ -677,7 +673,7 @@ GMPy_Integer_PowMod(PyObject *self, PyObject *args)
 
 
 PyDoc_STRVAR(GMPy_doc_integer_powmod_sec,
-"powmod_sec(x, y, m, /) -> mpz\n\n"
+"powmod_sec($module, x, y, m, /)\n--\n\n"
 "Return (x**y) mod m. Calculates x ** y (mod m) but using a constant\n"
 "time algorithm to reduce the risk of side channel attacks. y must be\n"
 "an integer >0. m must be an odd integer.");
@@ -798,7 +794,7 @@ GMPy_Number_Pow(PyObject *x, PyObject *y, PyObject *z, CTXT_Object *context)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_pow,
-"context.pow(x, y, /) -> mpz | mpq | mpfr | mpc\n\n"
+"pow($self, x, y, /)\n--\n\n"
 "Return x ** y.");
 
 static PyObject *

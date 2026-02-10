@@ -15,9 +15,6 @@ import packaging.version
 
 import gmpy2
 
-if sys.version_info < (3, 9):
-    raise RuntimeError("Python version >= 3.9 required to build docs.")
-
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.imgmath', 'sphinx.ext.doctest',
@@ -48,7 +45,7 @@ templates_path = ['_templates']
 
 # General information about the project.
 project = gmpy2.__package__
-copyright = '2012 - 2024, Case Van Horsen'
+copyright = '2012 - 2025, Case Van Horsen'
 
 gmpy2_version = packaging.version.parse(gmpy2.__version__)
 
@@ -69,6 +66,14 @@ html_theme = 'sphinx_rtd_theme'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [('index', 'gmpy2.tex', 'gmpy2 Documentation',
                     'Case Van Horsen', 'manual')]
+
+# A dictionary that contains LaTeX snippets overriding those Sphinx
+# usually puts into the generated .tex files.
+latex_elements = {
+    'preamble': r'''
+\DeclareUnicodeCharacter{03B5}{$\epsilon$}
+''',
+}
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).

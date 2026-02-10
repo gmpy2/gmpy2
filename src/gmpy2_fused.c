@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -187,11 +187,11 @@ GMPy_ComplexWithType_FMA(PyObject *x, int xtype, PyObject *y, int ytype, PyObjec
 }
 
 PyDoc_STRVAR(GMPy_doc_context_fma,
-"context.fma(x, y, z, /) -> mpz | mpq | mpfr | mpc\n\n"
+"fma($self, x, y, z, /)\n--\n\n"
 "Return correctly rounded result of (x * y) + z.");
 
 PyDoc_STRVAR(GMPy_doc_function_fma,
-"fma(x, y, z, /) -> mpz | mpq | mpfr | mpc\n\n"
+"fma($module, x, y, z, /)\n--\n\n"
 "Return correctly rounded result of (x * y) + z.");
 
 GMPY_MPFR_MPC_TRIOP_TEMPLATEWT(FMA, fma)
@@ -362,11 +362,11 @@ GMPy_ComplexWithType_FMS(PyObject *x, int xtype, PyObject *y, int ytype, PyObjec
     return result;
 }
 PyDoc_STRVAR(GMPy_doc_context_fms,
-"context.fms(x, y, z, /) -> mpz | mpq | mpfr | mpc\n\n"
+"fms($self, x, y, z, /)\n--\n\n"
 "Return correctly rounded result of (x * y) - z.");
 
 PyDoc_STRVAR(GMPy_doc_function_fms,
-"fms(x, y, z, /) -> mpz | mpq | mpfr | mpc\n\n"
+"fms($module, x, y, z, /)\n--\n\n"
 "Return correctly rounded result of (x * y) - z.");
 
 GMPY_MPFR_MPC_TRIOP_TEMPLATEWT(FMS, fms)
@@ -521,11 +521,11 @@ GMPy_RealWithType_FMMA(PyObject *x, int xtype, PyObject *y, int ytype, PyObject 
 }
 
 PyDoc_STRVAR(GMPy_doc_context_fmma,
-"context.fmma(x, y, z, t, /) -> mpfr\n\n"
+"fmma($self, x, y, z, t, /)\n--\n\n"
 "Return correctly rounded result of (x * y) + (z * t).");
 
 PyDoc_STRVAR(GMPy_doc_function_fmma,
-"fmma(x, y, z, t, /) -> mpfr\n\n"
+"fmma($module, x, y, z, t, /)\n--\n\n"
 "Return correctly rounded result of (x * y) + (z + t).");
 
 GMPY_MPFR_QUADOP_TEMPLATEWT(FMMA, fmma)
@@ -676,11 +676,11 @@ GMPy_RealWithType_FMMS(PyObject *x, int xtype, PyObject *y, int ytype, PyObject 
 }
 
 PyDoc_STRVAR(GMPy_doc_context_fmms,
-"context.fmms(x, y, z, t, /) -> mpfr\n\n"
+"fmms($self, x, y, z, t, /)\n--\n\n"
 "Return correctly rounded result of (x * y) - (z * t).");
 
 PyDoc_STRVAR(GMPy_doc_function_fmms,
-"fmms(x, y, z, t, /) -> mpfr\n\n"
+"fmms($module, x, y, z, t, /)\n--\n\n"
 "Return correctly rounded result of (x * y) - (z + t).");
 
 GMPY_MPFR_QUADOP_TEMPLATEWT(FMMS, fmms)

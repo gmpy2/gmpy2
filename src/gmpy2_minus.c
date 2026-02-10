@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -230,7 +230,7 @@ GMPy_Number_Minus(PyObject *x, CTXT_Object *context)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_minus,
-"context.minus(x, /) -> mpz | mpq | mpfr | mpc\n\n"
+"minus($self, x, /)\n--\n\n"
 "Return -x. The context is applied to the result.");
 
 static PyObject *

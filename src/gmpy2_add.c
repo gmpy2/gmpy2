@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -406,6 +406,46 @@ GMPy_Complex_AddWithType(PyObject *x, int xtype, PyObject *y, int ytype,
         return (PyObject*)result;
     }
 
+    if (IS_TYPE_COMPLEX(xtype) && IS_TYPE_REAL(ytype)) {
+        MPC_Object *tempx = NULL;
+        MPFR_Object *tempy = NULL;
+
+        if (!(tempx = GMPy_MPC_From_ComplexWithType(x, xtype, 1, 1, context)) ||
+            !(tempy = GMPy_MPFR_From_RealWithType(y, ytype, 1, context))) {
+            /* LCOV_EXCL_START */
+            Py_XDECREF((PyObject*)tempx);
+            Py_XDECREF((PyObject*)tempy);
+            Py_DECREF((PyObject*)result);
+            return NULL;
+            /* LCOV_EXCL_STOP */
+        }
+        result->rc = mpc_add_fr(result->c, tempx->c, MPFR(tempy), GET_MPC_ROUND(context));
+        Py_DECREF((PyObject*)tempx);
+        Py_DECREF((PyObject*)tempy);
+        _GMPy_MPC_Cleanup(&result, context);
+        return (PyObject*)result;
+    }
+
+    if (IS_TYPE_COMPLEX(ytype) && IS_TYPE_REAL(xtype)) {
+        MPC_Object *tempy = NULL;
+        MPFR_Object *tempx = NULL;
+
+        if (!(tempy = GMPy_MPC_From_ComplexWithType(y, ytype, 1, 1, context)) ||
+            !(tempx = GMPy_MPFR_From_RealWithType(x, xtype, 1, context))) {
+            /* LCOV_EXCL_START */
+            Py_XDECREF((PyObject*)tempx);
+            Py_XDECREF((PyObject*)tempy);
+            Py_DECREF((PyObject*)result);
+            return NULL;
+            /* LCOV_EXCL_STOP */
+        }
+        result->rc = mpc_add_fr(result->c, tempy->c, MPFR(tempx), GET_MPC_ROUND(context));
+        Py_DECREF((PyObject*)tempx);
+        Py_DECREF((PyObject*)tempy);
+        _GMPy_MPC_Cleanup(&result, context);
+        return (PyObject*)result;
+    }
+
     if (IS_TYPE_COMPLEX(xtype) && IS_TYPE_COMPLEX(ytype)) {
         MPC_Object *tempx = NULL, *tempy = NULL;
 
@@ -461,7 +501,7 @@ GMPy_Number_Add_Slot(PyObject *x, PyObject *y)
 /* Implement context.add() and gmpy2.add(). */
 
 PyDoc_STRVAR(GMPy_doc_function_add,
-"add(x, y, /) -> mpz | mpq | mpfr | mpc\n\n"
+"add($module, x, y, /)\n--\n\n"
 "Return x + y.");
 
 static PyObject *
@@ -489,8 +529,7 @@ GMPy_Number_Add(PyObject *x, PyObject *y, CTXT_Object *context)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_add,
-"context.add(x, y, /) -> mpz | mpq | mpfr | mpc\n\n"
-"Return x + y.");
+"add($self, x, y, /)\n--\n\nReturn x + y.");
 
 static PyObject *
 GMPy_Context_Add(PyObject *self, PyObject *args)

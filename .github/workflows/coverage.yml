@@ -1,0 +1,70 @@
+name: Run coverage tests
+
+on: [workflow_dispatch, workflow_call]
+
+jobs:
+  coverage:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [pypy3.11, "3.x"]
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+      - run: sudo apt-get update
+      - run: sudo apt-get install libmpc-dev lcov
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip 'setuptools<80' setuptools_scm
+          pip --verbose install --editable .[tests]
+      - name: Tests
+        run: |
+          pytest test/
+          PYTHONPATH=`pwd`/gmpy2 python test_cython/runtests.py
+      # XXX: why this doesn't work with pip install --editable above?
+      - name: Run coverage tests
+        run: |
+          pip uninstall -y gmpy2
+          python setup.py clean
+          CFLAGS="-coverage" python setup.py develop
+          pytest test/
+          PYTHONPATH=`pwd`/gmpy2 python test_cython/runtests.py
+          lcov --capture --directory . --no-external --output-file coverage.info
+          cp coverage.info build/coverage-${{ matrix.python-version }}.info
+      - uses: actions/upload-artifact@v6
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: |
+            build/coverage-${{ matrix.python-version }}.info
+          retention-days: 1
+  merge-coverage:
+    runs-on: ubuntu-24.04
+    needs:
+      - coverage
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: sudo apt-get update
+      - run: sudo apt-get install lcov
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: coverage-*
+          path: build/
+          merge-multiple: true
+      - run: |
+          genhtml build/coverage*.info --hierarchical \
+            --output-directory build/coverage
+      - uses: actions/upload-artifact@v6
+        with:
+          name: coverage
+          path: |
+            build/coverage/
+            build/coverage*.info

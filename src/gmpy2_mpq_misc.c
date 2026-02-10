@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -65,7 +65,7 @@ GMPy_MPQ_Attrib_GetImag(MPQ_Object *self, void *closure)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpq_function_numer,
-"numer(x, /) -> mpz\n\n"
+"numer($module, x, /)\n--\n\n"
 "Return the numerator of x.");
 
 static PyObject *
@@ -89,7 +89,7 @@ GMPy_MPQ_Function_Numer(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpq_function_denom,
-"denom(x, /) -> mpz\n\n"
+"denom($module, x, /)\n--\n\n"
 "Return the denominator of x.");
 
 static PyObject *
@@ -113,7 +113,7 @@ GMPy_MPQ_Function_Denom(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpq_method_as_integer_ratio,
-"x.as_integer_ratio() -> tuple[mpz, mpz]\n\n\
+"as_integer_ratio($self)\n--\n\n\
 Return a pair of integers, whose ratio is exactly equal to the\n\
 original number.  The ratio is in lowest terms and has a\n\
 positive denominator.");
@@ -125,11 +125,11 @@ GMPy_MPQ_Method_As_Integer_Ratio(PyObject *self, PyObject *Py_UNUSED(ignored))
 }
 
 PyDoc_STRVAR(GMPy_doc_mpq_method_from_float,
-"mpq.from_float(f, /) -> mpq\n\n\
+"from_float($self, f, /)\n--\n\n\
 Converts a finite float to a rational number, exactly.");
 
 PyDoc_STRVAR(GMPy_doc_mpq_method_from_decimal,
-"mpq.from_decimal(dec, /) -> mpq\n\n\
+"from_decimal($self, dec, /)\n--\n\n\
 Converts a finite `decimal.Decimal` instance to a rational number, exactly.");
 
 static PyObject *
@@ -154,7 +154,7 @@ GMPy_MPQ_Method_From_As_Integer_Ratio(PyTypeObject *type, PyObject *const *args,
 }
 
 PyDoc_STRVAR(GMPy_doc_function_qdiv,
-"qdiv(x, y=1, /) -> mpz | mpq\n\n"
+"qdiv($module, x, y=1, /)\n--\n\n"
 "Return x/y as `mpz` if possible, or as `mpq` if x is not exactly\n"
 "divisible by y.");
 
@@ -312,7 +312,8 @@ GMPy_MPQ_Method_Trunc(PyObject *self, PyObject *other)
     return (PyObject*)result;
 }
 
-PyDoc_STRVAR(GMPy_doc_mpq_method_round, "Round an mpq to power of 10.");
+PyDoc_STRVAR(GMPy_doc_mpq_method_round,
+"__round__($self, ndigits=0, /)\n--\n\nRound an mpq to power of 10.");
 
 static PyObject *
 GMPy_MPQ_Method_Round(PyObject *self, PyObject *args)
@@ -320,7 +321,7 @@ GMPy_MPQ_Method_Round(PyObject *self, PyObject *args)
     Py_ssize_t round_digits = 0;
     MPQ_Object *resultq;
     MPZ_Object *resultz;
-    mpz_t temp, rem;
+    mpz_t temp;
     CTXT_Object *context = NULL;
 
     CHECK_CONTEXT(context);
@@ -332,18 +333,52 @@ GMPy_MPQ_Method_Round(PyObject *self, PyObject *args)
             return NULL;
         }
 
-        mpz_init(rem);
-        mpz_fdiv_qr(resultz->z, rem, mpq_numref(MPQ(self)), mpq_denref(MPQ(self)));
-        mpz_mul_2exp(rem, rem, 1);
-        if (mpz_cmp(rem, mpq_denref(MPQ(self))) > 0) {
-            mpz_add_ui(resultz->z, resultz->z, 1);
-        }
-        else if (mpz_cmp(rem, mpq_denref(MPQ(self))) == 0) {
-            if (mpz_odd_p(resultz->z)) {
-                mpz_add_ui(resultz->z, resultz->z, 1);
+        CTXT_Object *context = NULL;
+        mpfr_rnd_t ctx_round;
+
+        CHECK_CONTEXT(context);
+        ctx_round = GET_MPFR_ROUND(context);
+        if (ctx_round == MPFR_RNDA) {
+            if (mpq_sgn(MPQ(self)) < 0) {
+                ctx_round = MPFR_RNDD;
+            }
+            else {
+                ctx_round = MPFR_RNDU;
             }
         }
-        mpz_clear(rem);
+        switch (ctx_round) {
+            case MPFR_RNDZ:
+                mpz_tdiv_q(resultz->z, mpq_numref(MPQ(self)),
+                           mpq_denref(MPQ(self)));
+                break;
+            case MPFR_RNDD:
+                mpz_fdiv_q(resultz->z, mpq_numref(MPQ(self)),
+                           mpq_denref(MPQ(self)));
+                break;
+            case MPFR_RNDU:
+                mpz_cdiv_q(resultz->z, mpq_numref(MPQ(self)),
+                           mpq_denref(MPQ(self)));
+                break;
+            case MPFR_RNDN:
+            default:
+                {
+                    mpz_t rem;
+
+                    mpz_init(rem);
+                    mpz_fdiv_qr(resultz->z, rem, mpq_numref(MPQ(self)),
+                                mpq_denref(MPQ(self)));
+                    mpz_mul_2exp(rem, rem, 1);
+                    if (mpz_cmp(rem, mpq_denref(MPQ(self))) > 0) {
+                        mpz_add_ui(resultz->z, resultz->z, 1);
+                    }
+                    else if (mpz_cmp(rem, mpq_denref(MPQ(self))) == 0) {
+                        if (mpz_odd_p(resultz->z)) {
+                            mpz_add_ui(resultz->z, resultz->z, 1);
+                        }
+                    }
+                    mpz_clear(rem);
+                }
+            }
         return (PyObject*)resultz;
     }
 
@@ -403,9 +438,150 @@ GMPy_MPQ_NonZero_Slot(MPQ_Object *self)
     return mpq_sgn(self->q) != 0;
 }
 
+PyDoc_STRVAR(GMPy_doc_mpq_method_limit_denominator,
+"limit_denominator($self, max_denominator=1000000)\n--\n\n"
+"Closest fraction to self with denominator at most max_denominator.");
+
+static PyObject *
+GMPy_MPQ_Method_Limit_Denominator(PyObject *self, PyObject *const *args,
+                         Py_ssize_t nargs, PyObject *kwnames)
+{
+    Py_ssize_t i, nkws = 0;
+    PyObject *arg;
+    int argidx[2] = {-1, -1};
+    const char *kwname;
+
+    if (nargs > 1) {
+        TYPE_ERROR("limit_denominator() takes at most 1 positional arguments");
+        return NULL;
+    }
+    if (nargs >= 1) {
+        argidx[0] = 0;
+    }
+
+    if (kwnames) {
+        nkws = PyTuple_GET_SIZE(kwnames);
+    }
+    if (nkws > 1) {
+        TYPE_ERROR("limit_denominator() takes at most 1 keyword arguments");
+        return NULL;
+    }
+    for (i = 0; i < nkws; i++) {
+        kwname = PyUnicode_AsUTF8(PyTuple_GET_ITEM(kwnames, i));
+        if (strcmp(kwname, "max_denominator") == 0) {
+            if (nargs == 0) {
+                argidx[0] = (int)(nargs + i);
+            }
+            else {
+                TYPE_ERROR("argument for limit_denominator() given by name ('max_denominator') and position (1)");
+                return NULL;
+            }
+        }
+        else {
+            TYPE_ERROR("got an invalid keyword argument for limit_denominator()");
+            return NULL;
+        }
+    }
+
+    mpz_t max_denominator;
+
+    if (argidx[0] >= 0) {
+        arg = args[argidx[0]];
+        if (PyLong_Check(arg)) {
+            arg = (PyObject *)GMPy_MPZ_From_PyLong(arg, NULL);
+            if (!arg) {
+                return NULL;
+            }
+            mpz_init_set(max_denominator, MPZ(arg));
+            Py_DECREF(arg);
+        }
+        else {
+            TYPE_ERROR("limit_denominator() takes an integer argument 'max_denominator'");
+            return NULL;
+        }
+    }
+    else {
+        mpz_init_set_ui(max_denominator, 1000000);
+    }
+    if (mpz_cmp_ui(max_denominator, 1) <= 0) {
+        VALUE_ERROR("max_denominator should be at least 1");
+        return NULL;
+    }
+
+    /* Literal translation of the CPython's
+     * Fraction.limit_denominator() follows.  See
+     * https://github.com/python/cpython/issues/95723 for
+     * correctness proof.
+     */
+
+    mpz_t n, d;
+
+    mpz_init_set(n, mpq_numref(MPQ(self)));
+    mpz_init_set(d, mpq_denref(MPQ(self)));
+
+    if (mpz_cmp(d, max_denominator) <= 0) {
+        mpz_clears(max_denominator, n, d, NULL);
+        return self;
+    }
+
+    mpz_t p0, q0, p1, q1, a, q2, t;
+
+    mpz_init_set_ui(p0, 0);
+    mpz_init_set_ui(q0, 1);
+    mpz_init_set_ui(p1, 1);
+    mpz_init_set_ui(q1, 0);
+    mpz_inits(a, q2, t, NULL);
+    while (1) {
+        mpz_fdiv_q(a, n, d);
+        mpz_mul(t, a, q1);
+        mpz_add(q2, q0, t);
+        if (mpz_cmp(q2, max_denominator) > 0) {
+            break;
+        }
+        mpz_set(q0, p0);
+        mpz_set(p0, p1);
+        mpz_mul(t, a, p1);
+        mpz_add(p1, q0, t);
+        mpz_set(q0, q1);
+        mpz_set(q1, q2);
+
+        mpz_mul(a, a, d);
+        mpz_set(t, n);
+        mpz_set(n, d);
+        mpz_sub(d, t, a);
+    }
+    mpz_sub(t, max_denominator, q0);
+    mpz_fdiv_q(t, t, q1);
+    mpz_mul(a, t, q1);
+    mpz_add(q0, q0, a);
+    mpz_mul(a, q0, d);
+    mpz_mul_ui(a, a, 2);
+
+    MPQ_Object *result = GMPy_MPQ_New(NULL);
+
+    if (!result) {
+        /* LCOV_EXCL_START */
+        mpz_clears(n, d, p0, p1, q0, q1, a, q2, t, NULL);
+        return NULL;
+        /* LCOV_EXCL_STOP */
+    }
+    if (mpz_cmp(a, mpq_denref(MPQ(self))) <= 0) {
+        mpq_set_num(MPQ(result), p1);
+        mpq_set_den(MPQ(result), q1);
+    }
+    else {
+        mpz_mul(t, t, p1);
+        mpz_add(p0, p0, t);
+        mpq_set_num(MPQ(result), p0);
+        mpq_set_den(MPQ(result), q0);
+    }
+    mpz_clears(n, d, p0, p1, q0, q1, a, q2, t, NULL);
+    return (PyObject *)result;
+}
+
 PyDoc_STRVAR(GMPy_doc_mpq_method_sizeof,
-"x.__sizeof__()\n\n"
-"Returns the amount of memory consumed by x. Note: deleted mpq objects\n"
+"__sizeof__($self)\n--\n\n"
+"Returns the amount of memory consumed by self. Note: deleted mpq objects\n"
 "are reused and may or may not be resized when a new value is assigned.");
 
 static PyObject *
@@ -416,3 +592,12 @@ GMPy_MPQ_Method_Sizeof(PyObject *self, PyObject *other)
         (mpq_denref(MPQ(self))->_mp_alloc * sizeof(mp_limb_t)));
 }
 
+PyDoc_STRVAR(GMPy_doc_mpq_method_is_integer,
+"is_integer($self)\n--\n\n"
+"Return `True` if self is an integer.");
+
+static PyObject *
+GMPy_MPQ_Method_IsInteger(PyObject *self, PyObject *other)
+{
+    return PyBool_FromLong(!mpz_cmp_ui(mpq_denref(MPQ(self)), 1));
+}

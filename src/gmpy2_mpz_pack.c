@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -37,7 +37,7 @@
  */
 
 PyDoc_STRVAR(doc_pack,
-"pack(lst, n, /) -> mpz\n\n"
+"pack($module, lst, n, /)\n--\n\n"
 "Pack a list of integers lst into a single `mpz` by concatenating\n"
 "each integer element of lst after padding to length n bits. Raises\n"
 "an error if any integer is negative or greater than n bits in\n"
@@ -130,7 +130,7 @@ GMPy_MPZ_pack(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_unpack,
-"unpack(x, n, /) -> list\n\n"
+"unpack($module, x, n, /)\n--\n\n"
 "Unpack an integer x into a list of n-bit values. Equivalent to\n"
 "repeated division by 2**n. Raises error if x is negative.");
 

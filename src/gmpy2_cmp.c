@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -25,7 +25,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 PyDoc_STRVAR(GMPy_doc_mpany_cmp,
-"cmp(x, y, /) -> int\n\n"
+"cmp($module, x, y, /)\n--\n\n"
 "Return -1 if x < y; 0 if x = y; or 1 if x > y. Both x and y must be\n"
 "integer, rational or real. Note: 0 is returned (and exception flag set)\n"
 "if either argument is NaN.");
@@ -251,7 +251,7 @@ GMPy_MPANY_cmp(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpany_cmp_abs,
-"cmp_abs(x, y, /) -> int\n\n"
+"cmp_abs($module, x, y, /)\n--\n\n"
 "Return -1 if abs(x) < abs(y); 0 if abs(x) = abs(y); or 1 else.");
 
 static PyObject *

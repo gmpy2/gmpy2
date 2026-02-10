@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -387,7 +387,7 @@ GMPy_Number_DivMod(PyObject *x, PyObject *y, CTXT_Object *context)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_divmod,
-"context.divmod(x, y, /) -> tuple[mpz|mpfr, mpz|mpq|mpfr]\n\n"
+"divmod($self, x, y, /)\n--\n\n"
 "Return divmod(x, y).\n\n"
 "Note: overflow, underflow, and inexact exceptions are not supported for\n"
 "`mpfr` arguments.");

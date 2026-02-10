@@ -1,0 +1,14 @@
+name: Run CI tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 2'
+jobs:
+  coverage:
+    uses: ./.github/workflows/coverage.yml
+  wheels:
+    uses: ./.github/workflows/wheels.yml
+    needs:
+      - coverage

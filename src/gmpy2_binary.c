@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -32,7 +32,7 @@
 /* Provide functions to access the old binary formats. */
 
 PyDoc_STRVAR(doc_mpz_from_old_binary,
-"mpz_from_old_binary(string, /) -> mpz\n\n"
+"mpz_from_old_binary($module, string, /)\n--\n\n"
 "Return an 'mpz' from a GMPY 1.x binary format.");
 
 static PyObject *
@@ -68,7 +68,7 @@ GMPy_MPZ_From_Old_Binary(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(doc_mpq_from_old_binary,
-"mpq_from_old_binary(string, /) -> mpq\n\n"
+"mpq_from_old_binary($module, string, /)\n--\n\n"
 "Return an 'mpq' from a GMPY 1.x binary format.");
 
 static PyObject *
@@ -125,7 +125,7 @@ GMPy_MPQ_From_Old_Binary(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(doc_mpfr_from_old_binary,
-"mpfr_from_old_binary(string, /) -> mpfr\n\n"
+"mpfr_from_old_binary($module, string, /)\n--\n\n"
 "Return an `mpfr` from a GMPY 1.x binary mpf format.");
 
 static PyObject *
@@ -646,15 +646,43 @@ GMPy_MPC_To_Binary(MPC_Object *obj)
     Py_DECREF((PyObject*)real);
     Py_DECREF((PyObject*)imag);
 
-    PyBytes_AS_STRING(result)[0] = 0x05;
-    PyBytes_AS_STRING(temp)[0] = 0x05;
+    Py_ssize_t result_size, temp_size;
+    char *result_str, *temp_str;
 
-    PyBytes_ConcatAndDel(&result, temp);
-    return result;
+    if ((PyBytes_AsStringAndSize(result, &result_str, &result_size) < 0)
+        || (PyBytes_AsStringAndSize(temp, &temp_str, &temp_size) < 0))
+    {
+        /* LCOV_EXCL_START */
+        Py_DECREF(result);
+        Py_DECREF(temp);
+        return NULL;
+        /* LCOV_EXCL_STOP */
+    }
+    result_str[0] = 0x05;
+    temp_str[0] = 0x05;
+
+    char *buf = PyMem_Malloc(result_size + temp_size);
+
+    if (!buf) {
+        /* LCOV_EXCL_START */
+        Py_DECREF(result);
+        Py_DECREF(temp);
+        return NULL;
+        /* LCOV_EXCL_STOP */
+    }
+    memcpy(buf, result_str, result_size);
+    memcpy(buf + result_size, temp_str, temp_size);
+    Py_DECREF(result);
+    Py_DECREF(temp);
+
+    PyObject *ret = PyBytes_FromStringAndSize(buf, result_size + temp_size);
+
+    PyMem_Free(buf);
+    return ret;
 }
 
 PyDoc_STRVAR(doc_from_binary,
-"from_binary(bytes, /) -> mpz | xmpz | mpq | mpfr | mpc\n\n"
+"from_binary($module, bytes, /)\n--\n\n"
 "Return a Python object from a byte sequence created by `to_binary()`.");
 
 static PyObject *
@@ -1210,7 +1238,7 @@ GMPy_MPANY_From_Binary(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(doc_to_binary,
-"to_binary(x, /) -> bytes\n\n"
+"to_binary($module, x, /)\n--\n\n"
 "Return a Python byte sequence that is a portable binary\n"
 "representation of a gmpy2 object x. The byte sequence can\n"
 "be passed to `from_binary()` to obtain an exact copy of\n"

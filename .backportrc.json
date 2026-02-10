@@ -1,0 +1,16 @@
+// .backportrc.json -- for https://github.com/sorenlouv/backport
+{
+  // Required
+  "repoOwner": "gmpy2",
+  "repoName": "gmpy2",
+  // the branches available to backport to
+  "targetBranchChoices": ["gmpy2-2.2.x"],
+  // Automatically detect which branches a pull request should be
+  // backported to based on the pull request labels.
+  "branchLabelMapping": {
+    "^backport-to-(.+)$": "gmpy2-$1"
+  },
+  "targetPRLabels": ["backport"],
+  "sourcePRLabels": ["backport-pr-created"],
+  "commitConflicts": true
+}

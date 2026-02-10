@@ -1,6 +1,8 @@
+import inspect
 import math
 import pickle
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 from fractions import Fraction
 
@@ -108,8 +110,10 @@ def test_mpfr_conversion():
     assert xmpz(mpfr(5.51)) == xmpz(6)
 
     pytest.raises(OverflowError, lambda: mpq(mpfr('inf')))
-    pytest.raises(OverflowError, lambda: float(mpfr('inf')))
-    pytest.raises(OverflowError, lambda: float(mpfr('1e+400')))
+
+    assert float(mpfr('inf')) == float('inf')
+    assert float(mpfr('-inf')) == float('-inf')
+    assert float(mpfr('1e+400')) == float('inf')
 
     assert mpq(mpfr(4.5)) == mpq(9,2)
     assert mpq(mpfr(0)) == mpq(0,1)
@@ -317,19 +321,19 @@ def test_mpfr_mpmath():
 def test_mpfr_format():
     r, r1, r2 = mpfr(5.6), mpfr(-3), mpfr(5)
 
-    assert '{:<30}'.format(r1) == '-3.000000                     '
-    assert '{:>+20}'.format(r2) == '           +5.000000'
-    assert '{:>-15}'.format(r2) == '       5.000000'
-    assert '{:>-15}'.format(r1) == '      -3.000000'
-    assert '{:U}'.format(r) == '5.600000'
+    assert '{:<30}'.format(r1) == '-3.0                          '
+    assert '{:>+20}'.format(r2) == '                +5.0'
+    assert '{:>-15}'.format(r2) == '            5.0'
+    assert '{:>-15}'.format(r1) == '           -3.0'
+    assert '{:U}'.format(r) == '5.5999999999999997'
 
     pytest.raises(ValueError, lambda: '{:U-}'.format(r))
 
-    assert '{:Z}'.format(r) == '5.599999'
+    assert '{:Z}'.format(r) == '5.5999999999999996'
 
     pytest.raises(ValueError, lambda: '{:Z+}'.format(r))
 
-    assert '{:+Z}'.format(r) == '+5.599999'
+    assert '{:+Z}'.format(r) == '+5.5999999999999996'
 
     pytest.raises(ValueError, lambda: '{:Z }'.format(r))
 
@@ -338,9 +342,24 @@ def test_mpfr_format():
 
     assert "{:.0f}".format(mpfr('123')) == '123.0'
 
+    assert "{:.2%}".format(mpfr('0.123')) == '12.30%'
+
+    assert "{:#a}".format(mpfr(1)) == '0x1.p+0'
+    assert "{:#g}".format(mpfr(1)) == '1.00000'
+
     pytest.raises(ValueError, lambda: '{:Z.}'.format(r))
     pytest.raises(ValueError, lambda: '{:->}'.format(r))
     pytest.raises(ValueError, lambda: '{:YZ}'.format(r))
+
+    # issue 666
+    r = mpfr('1.5707963267948966')
+    assert f'{r:e}' == '1.570796e+00'
+
+    # issue 503
+    r = mpfr(2.675)
+    assert f'{r:.2f}' == '2.67'
+    gmpy2.set_context(gmpy2.context(round=gmpy2.RoundUp))
+    assert f'{r:.2f}' == '2.68'
 
 
 def test_mpfr_digits():
@@ -923,3 +942,59 @@ def test_issue_540():
     ctxD = gmpy2.context(round=gmpy2.RoundDown)
 
     assert ctxD.div(a, b) == mpfr('0.099999999999999992')
+
+
+def test_mpfr_thread_safe():
+    def worker():
+        ctx = gmpy2.get_context()
+        ctx.clear_flags()
+        a = mpfr("1.2")
+        assert a.rc == -1
+        assert ctx.inexact
+        ctx.clear_flags()
+        a = mpfr("1")
+        assert a == 1
+        assert a.rc == 0
+        assert ctx.inexact is False
+        ctx.clear_flags()
+        a = mpfr("2.1")
+        assert a == 2.1
+        assert a.rc == 1
+        assert ctx.inexact
+    tpe = ThreadPoolExecutor(max_workers=20)
+    for _ in range(1000):
+        tpe.submit(worker)
+
+
+def test_issue_650():
+    x = -mpfr('nan')
+
+    assert gmpy2.copy_sign(mpfr(1), x) == -1
+    assert str(x) == 'nan'
+    assert gmpy2.copy_sign(mpfr(1), x) == -1
+
+
+def test_issue_567():
+    gmpy2.set_context(gmpy2.ieee(64))
+
+    ctx = get_context()
+
+    x = mpfr(2.675)
+    d = mpfr(2.67)
+    u = mpfr(2.68)
+
+    assert ctx.round == gmpy2.RoundToNearest
+    assert round(x, 2) == d
+    ctx.round = gmpy2.RoundDown
+    assert round(x, 2) == d
+    ctx.round = gmpy2.RoundUp
+    assert round(x, 2) == u
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="requires v3.13+")
+def test_mpfr_signatures():
+    cls = gmpy2.mpfr
+    for f in dir(cls):
+        a = getattr(cls, f)
+        if callable(a) and f != '__class__':
+            _ = inspect.signature(a)  # not raises

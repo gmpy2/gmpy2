@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -36,7 +36,7 @@
  */
 
 static MPZ_Object *
-GMPy_MPZ_New(CTXT_Object *context)
+GMPy_MPZ_New(CTXT_Object *Py_UNUSED(context))
 {
     MPZ_Object *result = NULL;
 
@@ -192,7 +192,7 @@ GMPy_MPZ_Dealloc(MPZ_Object *self)
 /* Caching logic for Pyxmpz. */
 
 static XMPZ_Object *
-GMPy_XMPZ_New(CTXT_Object *context)
+GMPy_XMPZ_New(CTXT_Object *Py_UNUSED(context))
 {
     XMPZ_Object *result = NULL;
 
@@ -206,7 +206,7 @@ GMPy_XMPZ_New(CTXT_Object *context)
         if (result == NULL) {
             return NULL;
         }
-       mpz_init(result->z);
+        mpz_init(result->z);
     }
     return result;
 }
@@ -327,7 +327,7 @@ GMPy_XMPZ_Dealloc(XMPZ_Object *self)
 /* Caching logic for Pympq. */
 
 static MPQ_Object *
-GMPy_MPQ_New(CTXT_Object *context)
+GMPy_MPQ_New(CTXT_Object *Py_UNUSED(context))
 {
     MPQ_Object *result = NULL;
 
@@ -462,8 +462,8 @@ GMPy_MPFR_New(mpfr_prec_t bits, CTXT_Object *context)
 {
     MPFR_Object *result;
 
+    CHECK_CONTEXT(context);
     if (bits < 2) {
-        CHECK_CONTEXT(context);
         bits = GET_MPFR_PREC(context);
     }
 
@@ -622,13 +622,12 @@ GMPy_MPC_New(mpfr_prec_t rprec, mpfr_prec_t iprec, CTXT_Object *context)
 {
     MPC_Object *result;
 
+    CHECK_CONTEXT(context);
     if (rprec < 2) {
-        CHECK_CONTEXT(context);
         rprec = GET_REAL_PREC(context);
     }
 
     if (iprec < 2) {
-        CHECK_CONTEXT(context);
         iprec = GET_IMAG_PREC(context);
     }
 

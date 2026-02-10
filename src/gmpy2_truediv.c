@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -23,6 +23,8 @@
  * You should have received a copy of the GNU Lesser General Public        *
  * License along with GMPY2; if not, see <http://www.gnu.org/licenses/>    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#include "fr_div.c"
 
 /* This file implements the / operator, gmpy2.div() and context.div().
  *
@@ -238,8 +240,75 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
         return (PyObject*)result;
     }
 
+    if (IS_TYPE_COMPLEX(xtype) && IS_TYPE_REAL(ytype)) {
+        MPC_Object *tempx = NULL;
+        MPFR_Object *tempy = NULL;
+
+        if (mpfr_zero_p(MPFR(y))) {
+            context->ctx.divzero = 1;
+            if (context->ctx.traps & TRAP_DIVZERO) {
+                GMPY_DIVZERO("'mpc' division by zero");
+                Py_DECREF((PyObject*)result);
+                return NULL;
+            }
+        }
+
+        if (!(tempx = GMPy_MPC_From_ComplexWithType(x, xtype, 1, 1, context)) ||
+            !(tempy = GMPy_MPFR_From_RealWithType(y, ytype, 1, context))) {
+            /* LCOV_EXCL_START */
+            Py_XDECREF((PyObject*)tempx);
+            Py_XDECREF((PyObject*)tempy);
+            Py_DECREF((PyObject*)result);
+            return NULL;
+            /* LCOV_EXCL_STOP */
+        }
+        result->rc = mpc_div_fr(result->c, tempx->c, MPFR(tempy), GET_MPC_ROUND(context));
+        Py_DECREF((PyObject*)tempx);
+        Py_DECREF((PyObject*)tempy);
+        _GMPy_MPC_Cleanup(&result, context);
+        return (PyObject*)result;
+    }
+
+    if (IS_TYPE_COMPLEX(ytype) && IS_TYPE_REAL(xtype)) {
+        MPC_Object *tempy = NULL;
+        MPFR_Object *tempx = NULL;
+
+        if (MPC_IS_ZERO_P(y)) {
+            context->ctx.divzero = 1;
+            if (context->ctx.traps & TRAP_DIVZERO) {
+                GMPY_DIVZERO("'mpc' division by zero");
+                Py_DECREF((PyObject*)result);
+                return NULL;
+            }
+        }
+
+        if (!(tempy = GMPy_MPC_From_ComplexWithType(y, ytype, 1, 1, context)) ||
+            !(tempx = GMPy_MPFR_From_RealWithType(x, xtype, 1, context))) {
+            /* LCOV_EXCL_START */
+            Py_XDECREF((PyObject*)tempx);
+            Py_XDECREF((PyObject*)tempy);
+            Py_DECREF((PyObject*)result);
+            return NULL;
+            /* LCOV_EXCL_STOP */
+        }
+        result->rc = mpc_fr_div(result->c, MPFR(tempx), tempy->c, GET_MPC_ROUND(context));
+        Py_DECREF((PyObject*)tempx);
+        Py_DECREF((PyObject*)tempy);
+        _GMPy_MPC_Cleanup(&result, context);
+        return (PyObject*)result;
+    }
+
     if (IS_TYPE_COMPLEX(xtype) && IS_TYPE_COMPLEX(ytype)) {
         MPC_Object *tempx = NULL, *tempy = NULL;
+
+        if (MPC_IS_ZERO_P(y)) {
+            context->ctx.divzero = 1;
+            if (context->ctx.traps & TRAP_DIVZERO) {
+                GMPY_DIVZERO("'mpc' division by zero");
+                Py_DECREF((PyObject*)result);
+                return NULL;
+            }
+        }
 
         if (!(tempx = GMPy_MPC_From_ComplexWithType(x, xtype, 1, 1, context)) ||
             !(tempy = GMPy_MPC_From_ComplexWithType(y, ytype, 1, 1, context))) {
@@ -289,7 +358,7 @@ GMPy_Number_TrueDiv_Slot(PyObject *x, PyObject *y)
 }
 
 PyDoc_STRVAR(GMPy_doc_truediv,
-"div(x, y, /) -> mpz | mpq | mpfr | mpc\n\n"
+"div($module, x, y, /)\n--\n\n"
 "Return x / y; uses true division.");
 
 static PyObject *
@@ -315,7 +384,7 @@ GMPy_Number_TrueDiv(PyObject *x, PyObject *y, CTXT_Object *context)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_truediv,
-"context.div(x, y, /) -> mpz | mpq | mpfr | mpc\n\n"
+"div($self, x, y, /)\n--\n\n"
 "Return x / y; uses true division.");
 
 static PyObject *

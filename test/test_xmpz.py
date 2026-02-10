@@ -1,3 +1,5 @@
+import inspect
+import sys
 from ctypes import memmove
 
 import pytest
@@ -439,3 +441,12 @@ def test_xmpz_to_from_binary(x):
     x = xmpz(x)
 
     assert from_binary(to_binary(x)) == x
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="requires v3.13+")
+def test_xmpz_signatures():
+    cls = gmpy2.xmpz
+    for f in dir(cls):
+        a = getattr(cls, f)
+        if callable(a) and f != '__class__':
+            _ = inspect.signature(a)  # not raises

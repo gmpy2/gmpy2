@@ -14,7 +14,9 @@ values.   The cutover point for performance varies, but can be as low as 20 to
     gmpy2 can crash the Python interpreter in case of memory allocation
     failure.  To mitigate this feature of memory management in the GMP library,
     you should estimate the size of all results and prevent calculations that
-    can exaust available memory.
+    can exaust available memory.  In case you are interested only in
+    the GMP bindings, you can use the
+    `python-gmp <https://pypi.org/project/python-gmp/>`_ package.
 
 The `mpfr` and `mpc` types provide support for correctly rounded multiple
 precision real and complex arithmetic via the MPFR and MPC libraries.  The
@@ -24,5 +26,12 @@ raise an exception.  It is possible to specify different precision and rounding
 modes for both the real and imaginary components of an `mpc`.  The default
 precision is 53 bits --- just same as for Python's `float` and `complex` types.
 
-Operator overloading is fully supported.  Coversion from native Python types is
+.. warning::
+
+   The gmpy2 has support for :term:`free threading` builds of the CPython.  But
+   this requires using thread-local storage for the MPFR data, such as as
+   flags, the exponent range, the default precision, etc.  That is, the MPFR
+   should be build with the ``--enable-thread-safe`` configure option.
+
+Operator overloading is fully supported.  Conversion from native Python types is
 optimized for performance.

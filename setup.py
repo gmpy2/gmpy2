@@ -22,8 +22,6 @@ class Gmpy2Build(build_ext):
          "Depend on MPFR and MPC internal implementations details"
          "(even more than the standard build)"),
         ('gcov', None, "Enable GCC code coverage collection"),
-        ('vector', None, "Include the vector_XXX() functions;"
-         "they are unstable and under active development"),
         ('static', None, "Enable static linking compile time options."),
         ('static-dir=', None, "Enable static linking and specify location."),
         ('gdb', None, "Build with debug symbols."),
@@ -33,7 +31,6 @@ class Gmpy2Build(build_ext):
         build_ext.initialize_options(self)
         self.fast = False
         self.gcov = False
-        self.vector = False
         self.static = False
         self.static_dir = False
         self.gdb = False
@@ -50,8 +47,6 @@ class Gmpy2Build(build_ext):
             _comp_args.append('O0')
             _comp_args.append('-coverage')
             self.libraries.append('gcov')
-        if self.vector:
-            _comp_args.append('DVECTOR=1')
         if self.static:
             _comp_args.remove('DSHARED=1')
             _comp_args.append('DSTATIC=1')
@@ -74,7 +69,7 @@ extensions = [
     Extension('gmpy2.gmpy2',
               sources=sources,
               include_dirs=include_dirs,
-              libraries=['mpc','mpfr','gmp'],
+              libraries=['mpc','mpfr','gmp'] + ([] if ON_WINDOWS else ['m']),
               library_dirs=library_dirs,
               extra_compile_args=_comp_args,
               )

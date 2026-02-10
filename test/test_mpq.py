@@ -1,7 +1,7 @@
+import inspect
 import math
 import numbers
 import pickle
-import platform
 import sys
 from decimal import Decimal
 from fractions import Fraction
@@ -45,15 +45,54 @@ def test_mpq_float():
     assert float(mpq(9, 5)) == 1.8
 
 
-@pytest.mark.skipif(platform.machine() != "x86_64",
-                    reason="XXX: fails in i686 manylinux images")
+DBL_MAX_EXP = sys.float_info.max_exp
+DBL_MIN_EXP = sys.float_info.min_exp
+DBL_MANT_DIG = sys.float_info.mant_dig
+DBL_MIN_OVERFLOW = 2**DBL_MAX_EXP - 2**(DBL_MAX_EXP - DBL_MANT_DIG - 1)
+
+
+# Pure Python version of correctly-rounded true division,
+# copied from CPython test suite (Lib/test/test_long.py).
+# The CPython's true division of integers suffers from double
+# rounding on x86 machines that operate with e x87 FPU set
+# to 64-bit precision.  See python/cpython#142449.
+def truediv(a, b):
+    """Correctly-rounded true division for integers."""
+    negative = a^b < 0
+    a, b = abs(a), abs(b)
+
+    # exceptions:  division by zero, overflow
+    if not b:
+        raise ZeroDivisionError("division by zero")
+    if a >= DBL_MIN_OVERFLOW * b:
+        raise OverflowError("int/int too large to represent as a float")
+
+   # find integer d satisfying 2**(d - 1) <= a/b < 2**d
+    d = a.bit_length() - b.bit_length()
+    if d >= 0 and a >= 2**d * b or d < 0 and a * 2**-d >= b:
+        d += 1
+
+    # compute 2**-exp * a / b for suitable exp
+    exp = max(d, DBL_MIN_EXP) - DBL_MANT_DIG
+    a, b = a << max(-exp, 0), b << max(exp, 0)
+    q, r = divmod(a, b)
+
+    # round-half-to-even: fractional part is r/b, which is > 0.5 iff
+    # 2*r > b, and == 0.5 iff 2*r == b.
+    if 2*r > b or 2*r == b and q % 2 == 1:
+        q += 1
+
+    result = math.ldexp(q, exp)
+    return -result if negative else result
+
+
 @settings(max_examples=10000)
 @given(fractions())
 @example(Fraction(12143, 31517))
 def test_mpq_float_bulk(x):
     q = mpq(x)
     try:
-        fx = float(x)
+        fx = truediv(x.numerator, x.denominator)
     except OverflowError:
         with pytest.raises(OverflowError):
             float(q)
@@ -162,6 +201,20 @@ def test_mpq_round():
     assert round(q, 4) == mpq(4,5)
 
     pytest.raises(TypeError, lambda: round(q, 4, 2))
+
+    gmpy2.set_context(gmpy2.ieee(64))
+    ctx = gmpy2.get_context()
+    q = mpq('111111/2222')
+
+    assert round(q, 3) == mpq(10001, 200)
+    ctx.round = gmpy2.RoundUp
+    assert round(q, 3) == mpq(10001, 200)
+    ctx.round = gmpy2.RoundAwayZero
+    assert round(q, 3) == mpq(10001, 200)
+    ctx.round = gmpy2.RoundToZero
+    assert round(q, 3) == mpq(12501, 250)
+    ctx.round = gmpy2.RoundDown
+    assert round(q, 3) == mpq(12501, 250)
 
 
 @settings(max_examples=1000)
@@ -567,6 +620,12 @@ def test_mpq_attributes():
     assert gmpy2.denom(pyq) == mpz(5)
 
 
+def test_mpq_is_integer():
+    assert mpq(0).is_integer()
+    assert mpq(123).is_integer()
+    assert not mpq(1, 2).is_integer()
+
+
 def test_mpq_conjugate():
     a = mpq(3, 11)
 
@@ -636,3 +695,38 @@ def test_issue_334():
     assert x == mpq(3,2)
     assert y == mpq(3,4)
     assert id(x) is not id(y)
+
+
+def test_mpq_limit_denominator():
+    x = mpq(1, 2)
+
+    pytest.raises(TypeError, lambda: x.limit_denominator(1, 2))
+    pytest.raises(TypeError, lambda: x.limit_denominator(x=1, y=2))
+    pytest.raises(TypeError, lambda: x.limit_denominator(x=1))
+    pytest.raises(TypeError, lambda: x.limit_denominator(1, max_denominator=2))
+    pytest.raises(TypeError, lambda: x.limit_denominator(1.1))
+    pytest.raises(ValueError, lambda: x.limit_denominator(-10))
+
+    x = mpq('3.141592653589793')
+
+    assert x.limit_denominator(10) == mpq(22, 7)
+    assert x.limit_denominator(100) == mpq(311, 99)
+    assert mpq(4321, 8765).limit_denominator(10000) == mpq(4321, 8765)
+
+    x = mpq('3.1415926535897932')
+    assert x.limit_denominator(10000) == mpq(355, 113)
+    assert -x.limit_denominator(10000) == mpq(-355, 113)
+    assert x.limit_denominator(113) == mpq(355, 113)
+    assert x.limit_denominator(112) == mpq(333, 106)
+    assert mpq(201, 200).limit_denominator(100) == mpq(1)
+    assert mpq(201, 200).limit_denominator(101) == mpq(102, 101)
+    assert mpq(0).limit_denominator(10000) == mpq(0)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="requires v3.13+")
+def test_mpq_signatures():
+    cls = gmpy2.mpq
+    for f in dir(cls):
+        a = getattr(cls, f)
+        if callable(a) and f != '__class__':
+            _ = inspect.signature(a)  # not raises

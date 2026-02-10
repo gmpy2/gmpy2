@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -27,7 +27,7 @@
 /* Miscellaneous module-level functions and helper functions. */
 
 PyDoc_STRVAR(GMPy_doc_license,
-"license() -> str\n\n"
+"license($module)\n--\n\n"
 "Return string giving license information.");
 
 static PyObject *
@@ -37,17 +37,26 @@ GMPy_get_license(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_version,
-"version() -> str\n\n"
+"version($module)\n--\n\n"
 "Return string giving current GMPY2 version.");
 
 static PyObject *
 GMPy_get_version(PyObject *self, PyObject *args)
 {
-    return PyUnicode_FromString(gmpy_version);
+    PyObject *gmpy2 = PyImport_ImportModule("gmpy2");
+
+    if (!gmpy2) {
+        return NULL; /* LCOV_EXCL_LINE */
+    }
+
+    PyObject *version = PyObject_GetAttrString(gmpy2, "__version__");
+
+    Py_DECREF(gmpy2);
+    return version;
 }
 
 PyDoc_STRVAR(GMPy_doc_mp_version,
-"mp_version() -> str\n\n"
+"mp_version($module)\n--\n\n"
 "Return string giving current GMP version.");
 
 static PyObject *
@@ -57,7 +66,7 @@ GMPy_get_mp_version(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpfr_version,
-"mpfr_version() -> str\n\n"
+"mpfr_version($module)\n--\n\n"
 "Return string giving current MPFR version.");
 
 static PyObject *
@@ -67,7 +76,7 @@ GMPy_get_mpfr_version(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpc_version,
-"mpc_version() -> str\n\n"
+"mpc_version($module)\n--\n\n"
 "Return string giving current MPC version.");
 
 static PyObject *
@@ -77,7 +86,7 @@ GMPy_get_mpc_version(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mp_limbsize,
-"mp_limbsize() -> int\n\n\
+"mp_limbsize($module)\n--\n\n\
 Return the number of bits per limb.");
 
 static PyObject *

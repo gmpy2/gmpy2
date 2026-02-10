@@ -1,36 +1,39 @@
 [build-system]
-requires = ['setuptools>=61']
+requires = ['setuptools>=77,<80', 'setuptools_scm[toml]>=6.0']
 build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'gmpy2'
-version = '2.2.1'
-description = 'gmpy2 interface to GMP, MPFR, and MPC for Python 3.8+'
+dynamic = ["version"]
+description = 'gmpy2 interface to GMP, MPFR, and MPC for Python'
 keywords = ['gmp', 'mpfr', 'mpc', 'multiple-precision',
             'arbitrary-precision', 'precision', 'bignum']
-license = {text = 'LGPL-3.0+'}
-authors = [{name = 'Case Van Horsen'}]
-maintainers = [{name = 'Case Van Horsen', email = 'casevh@gmail.com'}]
+license = 'LGPL-3.0-or-later'
+authors = [{name = 'Alex Martelli'},
+           {name = 'Case Van Horsen'}]
+maintainers = [{name = 'Matthias Köppe', email='mkoeppe@math.ucdavis.edu'},
+               {name = 'Sergey B Kirpichev', email='skirpichev@gmail.com'}]
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Intended Audience :: Developers',
                'Intended Audience :: Science/Research',
-               'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
                'Natural Language :: English',
                'Operating System :: MacOS :: MacOS X',
                'Operating System :: Microsoft :: Windows',
                'Operating System :: POSIX',
                'Programming Language :: C',
                'Programming Language :: Python :: 3',
-               'Programming Language :: Python :: 3.8',
                'Programming Language :: Python :: 3.9',
                'Programming Language :: Python :: 3.10',
                'Programming Language :: Python :: 3.11',
                'Programming Language :: Python :: 3.12',
                'Programming Language :: Python :: 3.13',
+               'Programming Language :: Python :: 3.14',
+               'Programming Language :: Python :: Free Threading :: 2 - Beta',
                'Programming Language :: Python :: Implementation :: CPython',
+               "Programming Language :: Python :: Implementation :: PyPy",
                'Topic :: Scientific/Engineering :: Mathematics',
                'Topic :: Software Development :: Libraries :: Python Modules']
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 
 [project.readme]
 file = 'README.rst'
@@ -39,10 +42,12 @@ content-type = 'text/x-rst'
 [project.optional-dependencies]
 docs = ['sphinx>=4', 'sphinx-rtd-theme>=1']
 tests = ['pytest', 'hypothesis', 'cython', 'mpmath', 'setuptools',
-         'numpy; python_version>="3.10" and platform_system=="Linux"']
+         'numpy; python_version>="3.11"']
 
 [project.urls]
-Homepage = 'https://github.com/aleaxit/gmpy'
+Homepage = 'https://github.com/gmpy2/gmpy2'
+
+[tool.setuptools_scm]
 
 [tool.setuptools]
 zip-safe = false
@@ -56,5 +61,30 @@ gmpy2 = ['*.pxd', '*.h', '*.dll', '*.lib']
 
 [tool.pytest.ini_options]
 addopts = "--durations=10"
-norecursedirs = ['build', '.eggs', '.git']
+norecursedirs = ['build', '.eggs', '.git', '.hypothesis']
 xfail_strict = true
+
+[tool.cibuildwheel]
+build-frontend = {name="build", args=["--verbose"]}
+enable = "pypy cpython-prerelease cpython-freethreading"
+before-all = "bash scripts/cibw_before_all.sh"
+test-extras = "tests"
+test-command = """pytest {package}/test && \
+                  python {package}/test_cython/runtests.py"""
+repair-wheel-command = """bash scripts/cibw_repair_wheel_command.sh \
+                          {dest_dir} {wheel}"""
+
+[tool.cibuildwheel.environment]
+LD_LIBRARY_PATH = "$(pwd)/.local/lib:$LD_LIBRARY_PATH"
+PKG_CONFIG_PATH = "$(pwd)/.local/lib/pkgconfig"
+PYTEST_ADDOPTS = "--verbose"
+
+[tool.cibuildwheel.windows]
+archs = ["auto64"]
+before-all = "msys2 -c scripts/cibw_before_all.sh"
+before-build = "pip install wheel delvewheel"
+repair-wheel-command = """scripts\\cibw_repair_wheel_command_windows.bat \
+                          {dest_dir} {wheel}"""
+
+[tool.cibuildwheel.windows.environment]
+PYTEST_ADDOPTS = "--verbose"

@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -124,7 +124,7 @@ GMPy_Number_Plus(PyObject *x, CTXT_Object *context)
  * a context. */
 
 PyDoc_STRVAR(GMPy_doc_context_plus,
-"context.plus(x, /) -> mpz | mpq | mpfr | mpc\n\n"
+"plus($self, x, /)\n--\n\n"
 "Return +x, the context is applied to the result.");
 
 static PyObject *

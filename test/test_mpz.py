@@ -1,6 +1,9 @@
+import inspect
 import math
 import numbers
 import pickle
+import sys
+from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
 
 import pytest
@@ -508,6 +511,24 @@ def test_mpz_round():
     raises(TypeError, lambda: round(mpz(123456),'a'))
     raises(TypeError, lambda: round(mpz(123456),'a',4))
 
+    # issue 552
+    assert round(mpz(501), -3) == mpz(1000)
+
+    # issue 567
+    gmpy2.set_context(gmpy2.ieee(64))
+    ctx = gmpy2.get_context()
+    x = mpz(123456)
+
+    assert round(x, -1) == mpz(123460)
+    ctx.round = gmpy2.RoundUp
+    assert round(x, -1) == mpz(123460)
+    ctx.round = gmpy2.RoundAwayZero
+    assert round(x, -1) == mpz(123460)
+    ctx.round = gmpy2.RoundToZero
+    assert round(x, -1) == mpz(123450)
+    ctx.round = gmpy2.RoundDown
+    assert round(x, -1) == mpz(123450)
+
 
 @settings(max_examples=10000)
 @given(integers())
@@ -637,6 +658,13 @@ def test_mpz_format():
     raises(ValueError, lambda: '{:#^16o}'.format(a))
 
     assert '{:^#16o}'.format(a) == '     0o173      '
+
+    # floating-point formats
+    assert '{:f}'.format(a) == '123.000000'
+    assert '{:g}'.format(a) == '123.0'
+
+    gmpy2.set_context(gmpy2.ieee(64))
+    assert '{:f}'.format(a<<1024) == 'inf'
 
 
 def test_mpz_digits():
@@ -1383,8 +1411,10 @@ def test_mpz_rshift():
 
     assert a>>1 == mpz(61)
     assert int(a)>>mpz(1) == mpz(61)
+    assert a>>111111111111111111111 == mpz(0)
+    assert (-a)>>111111111111111111111 == mpz(-1)
 
-    raises(OverflowError, lambda: a>>-2)
+    raises(ValueError, lambda: a>>-2)
 
     assert a>>0 == mpz(123)
 
@@ -1426,7 +1456,7 @@ def test_mpz_ilshift_irshift():
         x >>= mpfr(2)
     with raises(TypeError):
         x <<= mpfr(2)
-    with raises(OverflowError):
+    with raises(ValueError):
         x >>= -1
     with raises(OverflowError):
         x <<= -5
@@ -1485,6 +1515,11 @@ def test_mpz_is_square():
     assert not gmpy2.is_square(10)
     assert mpz(16).is_square()
     assert not mpz(17).is_square()
+
+
+def test_mpz_is_integer():
+    assert mpz(0).is_integer()
+    assert mpz(123).is_integer()
 
 
 def test_mpz_is_divisible():
@@ -1794,3 +1829,29 @@ def test_mpz_array():
     raises(TypeError, lambda: m.__array__(int, dtype=None))
     raises(TypeError, lambda: m.__array__(int, None, copy=None))
     raises(TypeError, lambda: m.__array__(spam=123))
+
+
+def test_mpz_thread_safe():
+    def worker():
+        ctx = gmpy2.get_context()
+        a = mpz(-1)
+        b = abs(a) + 2
+        a = b - 2
+        assert str(a/b) == '0.33333333333333331'
+        del a
+        ctx.rational_division = True
+        a = b - 2
+        assert str(a/b) == '1/3'
+        del b
+    tpe = ThreadPoolExecutor(max_workers=20)
+    for _ in range(1000):
+        tpe.submit(worker)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="requires v3.13+")
+def test_mpz_signatures():
+    cls = gmpy2.mpz
+    for f in dir(cls):
+        a = getattr(cls, f)
+        if callable(a) and f != '__class__':
+            _ = inspect.signature(a)  # not raises

@@ -30,9 +30,6 @@ setup (name = "gmpy2_demo",
        version = "0.3",
        description = "gmpy2_demo: gmpy2 demonstration programs",
        author = "Case Van Horsen",
-       maintainer = "Case Van Horsen",
-       maintainer_email = "casevh@gmail.com",
-       url = "https://github.com/aleaxit/gmpy",
-
+       url = "https://github.com/gmpy2/gmpy2",
        ext_modules = gmpy_ext
 )

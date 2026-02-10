@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -34,7 +34,7 @@
  */
 
 PyDoc_STRVAR(doc_c_divmod,
-"c_divmod(x, y, /) -> tuple[mpz, mpz]\n\n"
+"c_divmod($module, x, y, /)\n--\n\n"
 "Return the quotient and remainder of x divided by y. The quotient\n"
 "is rounded towards +Inf (ceiling rounding) and the remainder will\n"
 "have the opposite sign of y. x and y must be integers.");
@@ -82,7 +82,7 @@ GMPy_MPZ_c_divmod(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_c_div,
-"c_div(x, y, /) -> mpz\n\n"
+"c_div($module, x, y, /)\n--\n\n"
 "Return the quotient of x divided by y. The quotient is rounded\n"
 "towards +Inf (ceiling rounding). x and y must be integers.");
 
@@ -122,7 +122,7 @@ GMPy_MPZ_c_div(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_c_mod,
-"c_mod(x, y, /) -> mpz\n\n"
+"c_mod($module, x, y, /)\n--\n\n"
 "Return the remainder of x divided by y. The remainder will have\n"
 "the opposite sign of y. x and y must be integers.");
 
@@ -168,7 +168,7 @@ GMPy_MPZ_c_mod(PyObject *self, PyObject *args)
  */
 
 PyDoc_STRVAR(doc_f_divmod,
-"f_divmod(x, y, /) -> tuple[mpz, mpz]\n\n"
+"f_divmod($module, x, y, /)\n--\n\n"
 "Return the quotient and remainder of x divided by y. The quotient\n"
 "is rounded towards -Inf (floor rounding) and the remainder will\n"
 "have the same sign as y. x and y must be integers.");
@@ -216,7 +216,7 @@ GMPy_MPZ_f_divmod(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_f_div,
-"f_div(x, y, /) -> mpz\n\n"
+"f_div($module, x, y, /)\n--\n\n"
 "Return the quotient of x divided by y. The quotient is rounded\n"
 "towards -Inf (floor rounding). x and y must be integers.");
 
@@ -256,7 +256,7 @@ GMPy_MPZ_f_div(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_f_mod,
-"f_mod(x, y, /) -> mpz\n\n"
+"f_mod($module, x, y, /)\n--\n\n"
 "Return the remainder of x divided by y. The remainder will have\n"
 "the same sign as y. x and y must be integers.");
 
@@ -302,7 +302,7 @@ GMPy_MPZ_f_mod(PyObject *self, PyObject *args)
  */
 
 PyDoc_STRVAR(doc_t_divmod,
-"t_divmod(x, y, /) -> tuple[mpz, mpz]\n\n"
+"t_divmod($module, x, y, /)\n--\n\n"
 "Return the quotient and remainder of x divided by y. The quotient\n"
 "is rounded towards zero (truncation) and the remainder will have\n"
 "the same sign as x. x and y must be integers.");
@@ -350,7 +350,7 @@ GMPy_MPZ_t_divmod(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_t_div,
-"t_div(x, y, /) -> mpz\n\n"
+"t_div($module, x, y, /)\n--\n\n"
 "Return the quotient of x divided by y. The quotient is rounded\n"
 "towards 0. x and y must be integers.");
 
@@ -393,7 +393,7 @@ GMPy_MPZ_t_div(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(doc_t_mod,
-"t_mod(x, y, /) -> mpz\n\n"
+"t_mod($module, x, y, /)\n--\n\n"
 "Return the remainder of x divided by y. The remainder will have\n"
 "the same sign as x. x and y must be integers.");
 

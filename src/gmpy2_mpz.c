@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -110,6 +110,7 @@ static PyMethodDef GMPy_MPZ_methods[] = {
     { "is_prime", (PyCFunction)GMPy_MPZ_Method_IsPrime, METH_FASTCALL, GMPy_doc_mpz_method_is_prime },
     { "is_probab_prime", (PyCFunction)GMPy_MPZ_Method_IsProbabPrime, METH_FASTCALL, GMPy_doc_mpz_method_is_probab_prime },
     { "is_square", GMPy_MPZ_Method_IsSquare, METH_NOARGS, GMPy_doc_mpz_method_is_square },
+    { "is_integer", GMPy_MPZ_Method_IsInteger, METH_NOARGS, GMPy_doc_mpz_method_is_integer },
     { "num_digits", (PyCFunction)GMPy_MPZ_Method_NumDigits, METH_FASTCALL, GMPy_doc_mpz_method_num_digits },
     { "as_integer_ratio", GMPy_MPZ_Method_As_Integer_Ratio, METH_NOARGS, GMPy_doc_mpz_method_as_integer_ratio },
     { "to_bytes", (PyCFunction)GMPy_MPZ_Method_To_Bytes, METH_FASTCALL | METH_KEYWORDS, GMPy_doc_mpz_method_to_bytes },

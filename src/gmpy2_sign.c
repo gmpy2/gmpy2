@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -93,7 +93,7 @@ GMPy_Number_Sign(PyObject *x, CTXT_Object *context)
 }
 
 PyDoc_STRVAR(GMPy_doc_function_sign,
-"sign(x, /) -> int\n\n"
+"sign($module, x, /)\n--\n\n"
 "Return -1 if x < 0, 0 if x == 0, or +1 if x >0.");
 
 static PyObject *

@@ -1,0 +1,13 @@
+--- gmp-h.in.orig	2025-06-28 12:29:00.346848835 +0300
++++ gmp-h.in	2025-06-28 12:29:37.324340854 +0300
+@@ -101,8 +101,8 @@
+    make use of that.  Probably more trouble than it's worth.  */
+
+ #if defined (__GNUC__)
+-#define __GMP_DECLSPEC_EXPORT  __declspec(__dllexport__)
+-#define __GMP_DECLSPEC_IMPORT  __declspec(__dllimport__)
++#define __GMP_DECLSPEC_EXPORT
++#define __GMP_DECLSPEC_IMPORT
+ #endif
+ #if defined (_MSC_VER) || defined (__BORLANDC__)
+ #define __GMP_DECLSPEC_EXPORT  __declspec(dllexport)

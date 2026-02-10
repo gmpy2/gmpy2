@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -94,7 +94,7 @@ GMPy_CTXT_Dealloc(CTXT_Object *self)
 /* Begin support for context vars. */
 
 PyDoc_STRVAR(GMPy_doc_get_context,
-"get_context() -> context\n\n"
+"get_context($module)\n--\n\n"
 "Return a reference to the current context.");
 
 static inline PyObject *
@@ -131,7 +131,7 @@ GMPy_CTXT_Get(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_set_context,
-"set_context(context, /) -> None\n\n"
+"set_context($module, context, /)\n--\n\n"
 "Activate a context object controlling gmpy2 arithmetic.\n");
 
 /* Set the thread local context to a new context, decrement old reference */
@@ -156,7 +156,6 @@ GMPy_CTXT_Set(PyObject *self, PyObject *v)
     Py_RETURN_NONE;
 }
 
-#if 1
 static PyObject *
 GMPy_CTXT_Enter(PyObject *self, PyObject *args)
 {
@@ -193,13 +192,16 @@ GMPy_CTXT_Exit(PyObject *self, PyObject *args)
     }
     Py_RETURN_NONE;
 }
-#endif
 
 PyDoc_STRVAR(GMPy_doc_context_ieee,
-"ieee(size, /, subnormalize=True) -> context\n\n"
+"ieee($module, size, /, subnormalize=True)\n--\n\n"
 "Return a new context corresponding to a standard IEEE floating-point\n"
 "format. The supported sizes are 16, 32, 64, 128, and multiples of\n"
-"32 greater than 128.");
+"32 greater than 128.\n\n"
+"Note that `context.emax`/`context.emin` of the IEEE contexts have\n"
+"different meaning wrt the IEEE 754 standard: emax = e + 1 and\n"
+"emin = 4 - emax - precision, where e - maximum exponent\n"
+"in IEEE terms.");
 
 static PyObject *
 GMPy_CTXT_ieee(PyObject *self, PyObject *args, PyObject *kwargs)
@@ -369,7 +371,7 @@ GMPy_CTXT_Repr_Slot(CTXT_Object *self)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_copy,
-"context.copy() -> context\n\n"
+"copy($self)\n--\n\n"
 "Return a copy of a context.");
 
 static PyObject *
@@ -632,7 +634,7 @@ GMPy_CTXT_Context(PyTypeObject *type, PyObject *args, PyObject *kwargs)
 }
 
 PyDoc_STRVAR(GMPy_doc_context_clear_flags,
-"clear_flags() -> None\n\n"
+"clear_flags($self)\n--\n\n"
 "Clear all MPFR exception flags.");
 
 static PyObject *
@@ -1006,7 +1008,8 @@ GMPy_CTXT_Set_imag_round(CTXT_Object *self, PyObject *value, void *closure)
 
 PyDoc_STRVAR(GMPy_doc_CTXT_emin,
 "This attribute controls the minimum allowed exponent of an `mpfr`\n"
-"result.  The minimum exponent is platform dependent and can be\n"
+"result, the smallest positive value of a floating-point variable is\n"
+"0.5*2**emin.  The minimum exponent is platform dependent and can be\n"
 "retrieved with `get_emin_min()`.");
 
 static PyObject *
@@ -1039,7 +1042,9 @@ GMPy_CTXT_Set_emin(CTXT_Object *self, PyObject *value, void *closure)
 
 PyDoc_STRVAR(GMPy_doc_CTXT_emax,
 "This attribute controls the maximum allowed exponent of an `mpfr`\n"
-"result.  The maximum exponent is platform dependent and can be\n"
+"result, the largest positive value of floating-point variable is\n"
+"(1 - ε)*2**emax, where ε depends on precision of the variable.\n"
+"The maximum exponent is platform dependent and can be\n"
 "retrieved with `get_emax_max()`.");
 
 static PyObject *
@@ -1220,10 +1225,6 @@ static PyMethodDef GMPyContext_methods[] =
     { "tan", GMPy_Context_Tan, METH_O, GMPy_doc_context_tan },
     { "tanh", GMPy_Context_Tanh, METH_O, GMPy_doc_context_tanh },
     { "trunc", GMPy_Context_Trunc, METH_O, GMPy_doc_context_trunc },
-#ifdef VECTOR
-    { "vector", GMPy_Context_Vector, METH_O, GMPy_doc_context_vector },
-    { "vector2", GMPy_Context_Vector2, METH_VARARGS, GMPy_doc_context_vector2 },
-#endif
     { "yn", GMPy_Context_Yn, METH_VARARGS, GMPy_doc_context_yn },
     { "y0", GMPy_Context_Y0, METH_O, GMPy_doc_context_y0 },
     { "y1", GMPy_Context_Y1, METH_O, GMPy_doc_context_y1 },

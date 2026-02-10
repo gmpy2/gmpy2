@@ -1,4 +1,6 @@
 import ctypes
+import inspect
+import sys
 from fractions import Fraction
 
 import pytest
@@ -1842,3 +1844,15 @@ def test_other_funcs():
     assert gmpy2.erfc(r) == mpfr('2.382836284583028e-15')
     assert gmpy2.ai(r) == mpfr('2.6500613296849995e-05')
     assert gmpy2.remainder(mpfr(5), mpfr(3.2)) == mpfr('-1.4000000000000004')
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="requires v3.13+")
+def test_funcs_signatures():
+    for f in dir(gmpy2):
+        a = getattr(gmpy2, f)
+        if callable(a):
+            try:
+                _ = inspect.signature(a)
+            except ValueError:
+                if inspect.isfunction(a) or inspect.ismethod(a) or inspect.isbuiltin(a):
+                    assert a.__name__ == 'local_context'

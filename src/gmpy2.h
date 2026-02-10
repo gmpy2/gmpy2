@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -67,8 +67,8 @@ extern "C" {
 
 /* Check for minimum Python version requirements. */
 
-#if PY_VERSION_HEX < 0x03080000
-#  error "GMPY2 requires Python 3.8 or later."
+#if PY_VERSION_HEX < 0x03090000
+#  error "GMPY2 requires Python 3.9 or later."
 #endif
 
 /* Include headers for GMP, MPFR, and MPC. */
@@ -482,10 +482,6 @@ typedef struct {
 #include "gmpy2_sign.h"
 #include "gmpy2_richcompare.h"
 #include "gmpy2_cmp.h"
-
-#ifdef VECTOR
-#  include "gmpy2_vector.h"
-#endif /* defined(VECTOR) */
 
 #else /* defined(GMPY2_MODULE) */
 

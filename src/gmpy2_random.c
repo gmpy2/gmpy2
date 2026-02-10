@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -49,7 +49,7 @@ GMPy_RandomState_Repr(RandomState_Object *self)
 }
 
 PyDoc_STRVAR(GMPy_doc_random_state_factory,
-"random_state(seed=0, /) -> object\n\n"
+"random_state($module, seed=0, /)\n--\n\n"
 "Return new object containing state information for the random number\n"
 "generator. An optional integer can be specified as the seed value.");
 
@@ -84,7 +84,7 @@ GMPy_RandomState_Factory(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpz_urandomb_function,
-"mpz_urandomb(random_state, bit_count, /) -> mpz\n\n"
+"mpz_urandomb($module, random_state, bit_count, /)\n--\n\n"
 "Return uniformly distributed random integer between 0 and\n"
 "2**bit_count-1.");
 
@@ -122,7 +122,7 @@ GMPy_MPZ_urandomb_Function(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpz_rrandomb_function,
-"mpz_rrandomb(random_state, bit_count, /) -> mpz\n\n"
+"mpz_rrandomb($module, random_state, bit_count, /)\n--\n\n"
 "Return a random integer between 0 and 2**bit_count-1 with long\n"
 "sequences of zeros and one in its binary representation.");
 
@@ -160,7 +160,7 @@ GMPy_MPZ_rrandomb_Function(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpz_random_function,
-"mpz_random(random_state, int, /) -> mpz\n\n"
+"mpz_random($module, random_state, int, /)\n--\n\n"
 "Return uniformly distributed random integer between 0 and n-1.");
 
 static PyObject *
@@ -196,7 +196,7 @@ GMPy_MPZ_random_Function(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpfr_random_function,
-"mpfr_random(random_state, /) -> mpfr\n\n"
+"mpfr_random($module, random_state, /)\n--\n\n"
 "Return uniformly distributed number between [0,1].");
 
 static PyObject *
@@ -227,7 +227,7 @@ GMPy_MPFR_random_Function(PyObject *self, PyObject *args)
 #if MPFR_VERSION_MAJOR > 3
 
 PyDoc_STRVAR(GMPy_doc_mpfr_nrandom_function,
-"mpfr_nrandom(random_state, /) -> (mpfr)\n\n"
+"mpfr_nrandom($module, random_state, /)\n--\n\n"
 "Return a random number with gaussian distribution.");
 
 static PyObject *
@@ -257,7 +257,7 @@ GMPy_MPFR_nrandom_Function(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(GMPy_doc_mpfr_grandom_function,
-"mpfr_grandom(random_state, /) -> tuple[mpfr, mpfr]\n\n"
+"mpfr_grandom($module, random_state, /)\n--\n\n"
 "Return two random numbers with gaussian distribution.");
 
 static PyObject *
@@ -304,7 +304,7 @@ GMPy_MPFR_grandom_Function(PyObject *self, PyObject *args)
 }
 #else
 PyDoc_STRVAR(GMPy_doc_mpfr_grandom_function,
-"mpfr_grandom(random_state, /) -> (mpfr, mpfr)\n\n"
+"mpfr_grandom($module, random_state, /)\n--\n\n"
 "Return two random numbers with gaussian distribution.");
 
 static PyObject *
@@ -349,7 +349,7 @@ GMPy_MPFR_grandom_Function(PyObject *self, PyObject *args)
 
 
 PyDoc_STRVAR(GMPy_doc_mpc_random_function,
-"mpc_random(random_state, /) -> mpc\n\n"
+"mpc_random($module, random_state, /)\n--\n\n"
 "Return uniformly distributed number in the unit square [0,1]x[0,1].");
 
 static PyObject *

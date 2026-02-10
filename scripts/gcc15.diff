@@ -1,0 +1,51 @@
+changeset:   18477:8e7bb4ae7a18
+user:        Marc Glisse <marc.glisse@inria.fr>
+date:        Wed Jan 29 22:38:02 2025 +0100
+summary:     Complete function prototype in acinclude.m4 for C23 compatibility
+
+#diff -r e84c5c785bbe -r 8e7bb4ae7a18 ChangeLog
+#--- a/ChangeLog	Wed Dec 04 18:26:27 2024 +0100
+#+++ b/ChangeLog	Wed Jan 29 22:38:02 2025 +0100
+#@@ -1,3 +1,8 @@
+#+2025-01-29  Rudi Heitbaum <rudi@heitbaum.com>
+#+	    Marc Glisse <marc.glisse@inria.fr>
+#+
+#+	* acinclude.m4: Complete function prototype.
+#+
+# 2024-05-15 Sven Anderson <sven@anderson.de>
+#
+# 	* mpn/x86_64/fat/fat.c: Fix bug in BMI2 detection.
+diff -r e84c5c785bbe -r 8e7bb4ae7a18 acinclude.m4
+--- a/acinclude.m4	Wed Dec 04 18:26:27 2024 +0100
++++ b/acinclude.m4	Wed Jan 29 22:38:02 2025 +0100
+@@ -609,7 +609,7 @@
+
+ #if defined (__GNUC__) && ! defined (__cplusplus)
+ typedef unsigned long long t1;typedef t1*t2;
+-void g(){}
++void g(int,t1 const*,t1,t2,t1 const*,int){}
+ void h(){}
+ static __inline__ t1 e(t2 rp,t2 up,int n,t1 v0)
+ {t1 c,x,r;int i;if(v0){c=1;for(i=1;i<n;i++){x=up[i];r=x+1;rp[i]=r;}}return c;}
+diff --git a/configure b/configure
+index 7910aa0..fd1f494 100755
+--- a/configure
++++ b/configure
+@@ -6568,7 +6568,7 @@ if test "$gmp_prog_cc_works" = yes; then
+
+ #if defined (__GNUC__) && ! defined (__cplusplus)
+ typedef unsigned long long t1;typedef t1*t2;
+-void g(){}
++void g(int,t1 const*,t1,t2,t1 const*,int){}
+ void h(){}
+ static __inline__ t1 e(t2 rp,t2 up,int n,t1 v0)
+ {t1 c,x,r;int i;if(v0){c=1;for(i=1;i<n;i++){x=up[i];r=x+1;rp[i]=r;}}return c;}
+@@ -8187,7 +8187,7 @@ if test "$gmp_prog_cc_works" = yes; then
+
+ #if defined (__GNUC__) && ! defined (__cplusplus)
+ typedef unsigned long long t1;typedef t1*t2;
+-void g(){}
++void g(int,t1 const*,t1,t2,t1 const*,int){}
+ void h(){}
+ static __inline__ t1 e(t2 rp,t2 up,int n,t1 v0)
+ {t1 c,x,r;int i;if(v0){c=1;for(i=1;i<n;i++){x=up[i];r=x+1;rp[i]=r;}}return c;}

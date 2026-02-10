@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -594,20 +594,11 @@ GMPy_MPC_ConvertArg(PyObject *arg, PyObject **ptr)
 static PyObject *
 GMPy_MPC_Str_Slot(MPC_Object *self)
 {
-    PyObject *result, *temp;
-    mpfr_prec_t rbits, ibits;
-    long rprec, iprec;
-    char fmtstr[60];
+    PyObject *result, *temp = PyUnicode_FromString("{0:}");
 
-    mpc_get_prec2(&rbits, &ibits, MPC(self));
-    rprec = (long)(log10(2) * (double)rbits) + 2;
-    iprec = (long)(log10(2) * (double)ibits) + 2;
-
-    sprintf(fmtstr, "{0:.%ld.%ldg}", rprec, iprec);
-
-    temp = PyUnicode_FromString(fmtstr);
-    if (!temp)
+    if (!temp) {
         return NULL;
+    }
     result = PyObject_CallMethod(temp, "format", "O", self);
     Py_DECREF(temp);
     return result;
@@ -618,22 +609,19 @@ GMPy_MPC_Repr_Slot(MPC_Object *self)
 {
     PyObject *result, *temp;
     mpfr_prec_t rbits, ibits;
-    long rprec, iprec;
-    char fmtstr[60];
+    char fmtstr[100];
 
     mpc_get_prec2(&rbits, &ibits, MPC(self));
-    rprec = (long)(log10(2) * (double)rbits) + 2;
-    iprec = (long)(log10(2) * (double)ibits) + 2;
-
-    if (rbits != DBL_MANT_DIG || ibits !=DBL_MANT_DIG)
-        sprintf(fmtstr, "mpc('{0:.%ld.%ldg}',(%ld,%ld))",
-                rprec, iprec, rbits, ibits);
-    else
-        sprintf(fmtstr, "mpc('{0:.%ld.%ldg}')", rprec, iprec);
-
+    if (rbits != DBL_MANT_DIG || ibits !=DBL_MANT_DIG) {
+        sprintf(fmtstr, "mpc('{0:}',(%ld,%ld))", rbits, ibits);
+    }
+    else {
+        sprintf(fmtstr, "mpc('{0:}')");
+    }
     temp = PyUnicode_FromString(fmtstr);
-    if (!temp)
+    if (!temp) {
         return NULL;
+    }
     result = PyObject_CallMethod(temp, "format", "O", self);
     Py_DECREF(temp);
     return result;

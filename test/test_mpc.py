@@ -1,8 +1,12 @@
+from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
+import cmath
+import inspect
+import sys
 
 import pytest
 from hypothesis import example, given, settings
-from hypothesis.strategies import complex_numbers
+from hypothesis.strategies import complex_numbers, floats
 from supportclasses import a, b, c, cx, d, q, r, z
 
 import gmpy2
@@ -182,13 +186,13 @@ def test_mpc_format():
 
     c, c1 = mpc(mpq(1/3), 5), mpc(-1, -2)
 
-    assert '{:>20}'.format(c) == '  0.333333+5.000000j'
-    assert '{:<20}'.format(c) == '0.333333+5.000000j  '
-    assert '{:^20}'.format(c) == ' 0.333333+5.000000j '
+    assert '{:>30}'.format(c) == '      0.33333333333333331+5.0j'
+    assert '{:<30}'.format(c) == '0.33333333333333331+5.0j      '
+    assert '{:^30}'.format(c) == '   0.33333333333333331+5.0j   '
 
     pytest.raises(ValueError, lambda: '{:<<20}'.format(c))
 
-    assert '{:>+20}'.format(c) == ' +0.333333+5.000000j'
+    assert '{:>+30}'.format(c) == '     +0.33333333333333331+5.0j'
 
     pytest.raises(ValueError, lambda: '{:+^20}'.format(c))
 
@@ -197,21 +201,33 @@ def test_mpc_format():
     pytest.raises(ValueError, lambda: '{:Z.10f}'.format(c))
     pytest.raises(ValueError, lambda: '{:Z 10}'.format(c))
 
-    assert '{:Z}'.format(c) == '0.333333+5.000000j'
-    assert '{:U}'.format(c) == '0.333334+5.000000j'
+    assert '{:Z}'.format(c) == '0.33333333333333331+5.0j'
+    assert '{:U}'.format(c) == '0.33333333333333332+5.0j'
 
     pytest.raises(ValueError, lambda: '{:PU}'.format(c))
 
-    assert '{:UP}'.format(c) == '0.333334+5.000000j'
+    assert '{:UP}'.format(c) == '0.333334+5.0j'
 
     pytest.raises(ValueError, lambda: '{:PP}'.format(c))
 
     assert '{:G}'.format(c) == '0.333333+5.0j'
-    assert '{:M}'.format(c) == '(0.333333 5.000000)'
+    assert '{:M}'.format(c) == '(0.333333 5.0)'
     assert '{:b}'.format(c) == '1.0101010101010101010101010101010101010101010101010101p-2+1.01p+2j'
     assert '{:a}'.format(c) == '0x5.5555555555554p-4+0x5p+0j'
-    assert '{:e}'.format(c) in ('3.3333333333333331e-01+5e+00j', '3.3333333333333331e-01+5.0000000000000000e+00j')
-    assert '{:M}'.format(c1) == '(-1.000000 -2.000000)'
+    assert '{:e}'.format(c) == '3.333333e-01+5.000000e+00j'
+    assert '{:M}'.format(c1) == '(-1.0 -2.0)'
+
+    assert "{:#g}".format(mpc(1)) == '1.00000+0.00000j'
+
+    # issue 666
+    r = mpc('1.5707963267948966')
+    assert f'{r:e}' == '1.570796e+00+0.000000e+00j'
+
+    # issue 503
+    c = mpc(2.675)
+    assert f'{c:.2f}' == '2.67+0.00j'
+    gmpy2.set_context(gmpy2.context(round=gmpy2.RoundUp))
+    assert f'{c:.2f}' == '2.68+0.00j'
 
 
 def test_mpc_repr():
@@ -293,6 +309,12 @@ def test_mpc_add():
 
     assert is_nan(x.real) and x.imag == 2.0
 
+    a = mpc('1-0j')
+    b = mpfr('1')
+    c = mpc('2-0j')
+
+    assert repr(a+b) == repr(b + a) == repr(c)
+
 
 def test_mpc_sub():
     pytest.raises(TypeError, lambda: mpc(1,2) - 'a')
@@ -330,6 +352,12 @@ def test_mpc_sub():
 
     assert is_nan(x.real) and x.imag == 2.0
 
+    a = mpc('1+0j')
+    b = mpfr('1')
+    c = mpc('0-0j')
+
+    assert repr(b - a) == repr(c)
+
 
 def test_mpc_mul():
     pytest.raises(TypeError, lambda: mpc(1,2) * 'a')
@@ -361,6 +389,12 @@ def test_mpc_mul():
     for x in [aj * float('nan'), mpc(0,0) * float('inf'),
               mpc(0,0) * float('-inf'), mpc(0,0) * float('nan')]:
         assert all(is_nan(_) for _ in [x.real, x.imag])
+
+    a = mpc('inf-1j')
+    b = mpfr('inf')
+    c = mpc('inf-infj')
+
+    assert a*b == b*a == c
 
 
 def test_mpc_divmod():
@@ -401,11 +435,21 @@ def test_mpc_div():
     with gmpy2.context(trap_divzero=True):
         with pytest.raises(gmpy2.DivisionByZeroError):
             mpc(15, 15)/mpc(0)
+        with pytest.raises(gmpy2.DivisionByZeroError):
+            mpfr(1)/mpc(0)
+        with pytest.raises(gmpy2.DivisionByZeroError):
+            mpc(1)/mpfr(0)
 
     assert aj / float('inf') == mpc('0.0+0.0j')
     assert aj / float('-inf') == mpc('-0.0-0.0j')
     assert float('inf') / aj == mpc('inf-infj')
     assert float('-inf') / aj == mpc('-inf+infj')
+
+    a = mpc('1-infj')
+    b = 1
+
+    assert a/b == a
+    assert repr(b/a) == repr(mpc(0))
 
 
 def test_mpc_mod():
@@ -465,3 +509,87 @@ def test_mpc_exc():
     ctx.trap_invalid = True
 
     pytest.raises(gmpy2.InvalidOperationError, lambda: mpc(mpfr('nan')))
+
+
+def test_issue_520():
+    z = gmpy2.mpc(-0.0, 2)
+    res = gmpy2.asinh(z)
+    assert cmath.isclose(gmpy2.log(z + gmpy2.sqrt(1 + z*z)), res)
+
+
+def test_mpc_thread_safe():
+    def worker():
+        test_mpc_creation()
+    tpe = ThreadPoolExecutor(max_workers=20)
+    for _ in range(1000):
+        tpe.submit(worker)
+
+
+def test_issue_650():
+    x = -mpfr('nan')
+    z = mpc(x, 1)
+
+    assert gmpy2.copy_sign(mpfr(1), z.real) == -1
+    assert str(z) == 'nan+1.0j'
+    assert gmpy2.copy_sign(mpfr(1), z.real) == -1
+
+    z = mpc(1, x)
+
+    assert gmpy2.copy_sign(mpfr(1), z.imag) == -1
+    assert str(z) == '1.0+nanj'
+    assert gmpy2.copy_sign(mpfr(1), z.imag) == -1
+
+
+@pytest.mark.skipif(sys.version_info < (3, 14), reason="requires v3.14+")
+def test_mpc_mixed_arithmetics():
+    from itertools import combinations_with_replacement
+    from math import inf, nan
+    from operator import add, mul, sub, truediv
+
+    gmpy2.set_context(gmpy2.ieee(64))
+    gmpy2.get_context().trap_divzero = True
+    cases = [0.0, -0.0, inf, -inf, nan, -1.0, 1.0, 2.0, -3.0]
+
+    for x in cases:
+        gx = gmpy2.mpfr(x)
+        for z in combinations_with_replacement(cases, 2):
+            z = complex(*z)
+            gz = gmpy2.mpc(z)
+            for op in [add, mul, sub, truediv]:
+                try:
+                    r1 = op(x, z)
+                except ZeroDivisionError:
+                    try:
+                        op(gx, gz)
+                        assert False
+                    except ZeroDivisionError:
+                        g1 = r1 = 0j
+                else:
+                    g1 = op(gx, gz)
+                try:
+                    r2 = op(z, x)
+                except ZeroDivisionError:
+                    try:
+                        op(gz, gx)
+                        assert False
+                    except ZeroDivisionError:
+                        g2 = r2 = 0j
+                else:
+                    g2 = op(gz, gx)
+                if op not in [sub, truediv]:
+                    assert str(r1) == str(r2)
+                    assert str(g1) == str(g2)
+                if str(r1) != str(complex(g1)):
+                    assert cmath.isfinite(r1) and x and all(_ for _ in [z.real,
+                                                                        z.imag])
+                    assert cmath.isclose(r1, complex(g1))
+                assert str(r2) == str(complex(g2))
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="requires v3.13+")
+def test_mpc_signatures():
+    cls = gmpy2.mpc
+    for f in dir(cls):
+        a = getattr(cls, f)
+        if callable(a) and f != '__class__':
+            _ = inspect.signature(a)  # not raises

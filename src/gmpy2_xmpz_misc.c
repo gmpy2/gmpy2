@@ -6,7 +6,7 @@
  *                                                                         *
  * Copyright 2000 - 2009 Alex Martelli                                     *
  *                                                                         *
- * Copyright 2008 - 2024 Case Van Horsen                                   *
+ * Copyright 2008 - 2025 Case Van Horsen                                   *
  *                                                                         *
  * This file is part of GMPY2.                                             *
  *                                                                         *
@@ -28,7 +28,7 @@
 #include "pythoncapi_compat.h"
 
 PyDoc_STRVAR(GMPy_doc_xmpz_function_xbit_mask,
-"xbit_mask(n, /) -> xmpz\n\n"
+"xbit_mask($module, n, /)\n--\n\n"
 "Return an 'xmpz' exactly n bits in length with all bits set.\n");
 
 static PyObject *
@@ -98,8 +98,8 @@ GMPy_XMPZ_Com_Slot(XMPZ_Object *x)
 }
 
 PyDoc_STRVAR(GMPy_doc_xmpz_method_make_mpz,
-"x.make_mpz() -> mpz\n\n"
-"Return an `mpz` by converting x as quickly as possible.\n\n"
+"make_mpz($self)\n--\n\n"
+"Return an `mpz` by converting self as quickly as possible.\n\n"
 "NOTE: Optimized for speed so the original `xmpz` value is set to 0!");
 
 static PyObject *
@@ -119,8 +119,8 @@ GMPy_XMPZ_Method_MakeMPZ(PyObject *self, PyObject *other)
 }
 
 PyDoc_STRVAR(GMPy_doc_xmpz_method_copy,
-"x.copy() -> xmpz\n\n"
-"Return a copy of a x.");
+"copy($self)\n--\n\n"
+"Return a copy of a self.");
 
 static PyObject *
 GMPy_XMPZ_Method_Copy(PyObject *self, PyObject *other)
@@ -402,8 +402,8 @@ GMPy_Iter_Repr(GMPy_Iter_Object *self)
 }
 
 PyDoc_STRVAR(GMPy_doc_xmpz_method_iter_bits,
-"x.iter_bits(start=0, stop=-1) -> collections.abc.Iterator\n\n"
-"Return `True` or `False` for each bit position in x beginning at\n"
+"iter_bits($self, start=0, stop=-1)\n--\n\n"
+"Return `True` or `False` for each bit position in self beginning at\n"
 "'start'. If a positive value is specified for 'stop', iteration is\n"
 "continued until 'stop' is reached. If a negative value is specified,\n"
 "iteration is continued until the last 1-bit. Note: the value of the\n"
@@ -435,9 +435,9 @@ GMPy_XMPZ_Method_IterBits(PyObject *self, PyObject *args, PyObject *kwargs)
 }
 
 PyDoc_STRVAR(GMPy_doc_xmpz_method_iter_set,
-"x.iter_set(start=0, stop=-1) -> collections.abc.Iterator\n\n"
+"iter_set($self, start=0, stop=-1)\n--\n\n"
 "Return an iterator yielding the bit position for every bit that\n"
-"is set in x, beginning at 'start'. If a positive value is\n"
+"is set in self, beginning at 'start'. If a positive value is\n"
 "specified for 'stop', iteration is continued until 'stop' is\n"
 "reached. To match the behavior of slicing, 'stop' is not included.\n"
 "If a negative value is specified, iteration is continued until\n"
@@ -470,8 +470,8 @@ GMPy_XMPZ_Method_IterSet(PyObject *self, PyObject *args, PyObject *kwargs)
 }
 
 PyDoc_STRVAR(GMPy_doc_xmpz_method_iter_clear,
-"x.iter_clear(start=0, stop=-1) -> collections.abc.Iterator\n\n"
-"Return every bit position that is clear in x, beginning at\n"
+"iter_clear($self, start=0, stop=-1)\n--\n\n"
+"Return every bit position that is clear in self, beginning at\n"
 "'start'. If a positive value is specified for 'stop', iteration\n"
 "is continued until 'stop' is reached. If a negative value is specified,\n"
 "iteration is continued until the last 1-bit. Note: the value of the\n"
@@ -539,8 +539,8 @@ GMPy_XMPZ_Attrib_GetImag(XMPZ_Object *self, void *closure)
 }
 
 PyDoc_STRVAR(GMPy_doc_xmpz_method_sizeof,
-"x.__sizeof__()\n\n"
-"Returns the amount of memory consumed by x. Note: deleted xmpz objects\n"
+"__sizeof__($self)\n--\n\n"
+"Returns the amount of memory consumed by self. Note: deleted xmpz objects\n"
 "are reused and may or may not be resized when a new value is assigned.");
 
 static PyObject *
