@@ -38,7 +38,7 @@ jobs:
           PYTHONPATH=`pwd`/gmpy2 python test_cython/runtests.py
           lcov --capture --directory . --no-external --output-file coverage.info
           cp coverage.info build/coverage-${{ matrix.python-version }}.info
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ matrix.python-version }}
           path: |
@@ -62,7 +62,7 @@ jobs:
       - run: |
           genhtml build/coverage*.info --hierarchical \
             --output-directory build/coverage
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: |
