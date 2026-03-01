@@ -43,7 +43,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-    - uses: actions/download-artifact@v7
+    - uses: actions/download-artifact@v8
       with:
         pattern: gmpy2-*
         path: dist/
@@ -60,7 +60,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-    - uses: actions/download-artifact@v7
+    - uses: actions/download-artifact@v8
       with:
         pattern: gmpy2-*
         path: dist/
