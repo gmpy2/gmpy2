@@ -25,3 +25,11 @@ def test_misc():
 def test_sizeof():
     assert sys.getsizeof(gmpy2.mpz(10)) > 0
     assert sys.getsizeof(gmpy2.mpfr('1.0')) > 0
+
+
+def test_issue_686():
+    assert gmpy2.mpz.__module__ == 'gmpy2'
+    assert gmpy2.xmpz.__module__ == 'gmpy2'
+    assert gmpy2.mpq.__module__ == 'gmpy2'
+    assert gmpy2.mpfr.__module__ == 'gmpy2'
+    assert gmpy2.mpc.__module__ == 'gmpy2'

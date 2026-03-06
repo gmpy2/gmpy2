@@ -202,7 +202,7 @@ static PyGetSetDef Pympc_getseters[] =
 static PyTypeObject MPC_Type =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "mpc",
+    .tp_name = "gmpy2.mpc",
     .tp_basicsize = sizeof(MPC_Object),
     .tp_dealloc = (destructor) GMPy_MPC_Dealloc,
     .tp_repr = (reprfunc) GMPy_MPC_Repr_Slot,
