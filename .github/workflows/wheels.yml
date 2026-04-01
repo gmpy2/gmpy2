@@ -34,7 +34,7 @@ jobs:
           path-type: inherit
         if: contains(matrix.os, 'windows')
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v3.4.0
       - uses: actions/upload-artifact@v7
         with:
           name: wheels-${{ matrix.os }}
