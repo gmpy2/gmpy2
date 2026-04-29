@@ -57,6 +57,9 @@ def test_context_ieee():
 
     assert gmpy2.const_pi().digits(2) == ('11001001000011111101101010100010001000010110100011000010001101001100010011000110011000101000101110000000110111000', 2, 113)
 
+    pytest.raises(ValueError, lambda: ieee(16*31))
+    assert ieee(32*31).precision == 965
+
 
 def test_context():
     ctx = context()

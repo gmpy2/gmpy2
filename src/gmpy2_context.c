@@ -267,8 +267,9 @@ GMPy_CTXT_ieee(PyObject *self, PyObject *args, PyObject *kwargs)
         result->ctx.emax = 16384;
     }
     else {
-        if ((bitwidth < 128) && (bitwidth & 31)) {
-            VALUE_ERROR("bitwidth must be 16, 32, 64, 128; or must be greater than 128 and divisible by 32.");
+        if ((bitwidth < 128) || (bitwidth & 31)) {
+            VALUE_ERROR("bitwidth must be 16, 32, 64, 128; or "
+                        "must be greater than 128 and divisible by 32.");
             Py_DECREF((PyObject*)result);
             return NULL;
         }
