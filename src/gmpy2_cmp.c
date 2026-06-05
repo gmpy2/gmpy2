@@ -264,7 +264,7 @@ GMPy_MPANY_cmp_abs(PyObject *self, PyObject *args)
     CHECK_CONTEXT(context);
 
     if (PyTuple_GET_SIZE(args) != 2) {
-        TYPE_ERROR("cmp() requires 2 arguments");
+        TYPE_ERROR("cmp_abs() requires 2 arguments");
         return NULL;
     }
 
