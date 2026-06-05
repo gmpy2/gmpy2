@@ -2002,7 +2002,7 @@ GMPy_MPZ_Method_To_Bytes(PyObject *self, PyObject *const *args,
 
     if (is_negative) {
         if (!is_signed) {
-            OVERFLOW_ERROR("can't convert negative mpz to unsigned");
+            OVERFLOW_ERROR("cannot convert negative mpz to unsigned");
             return NULL;
         }
         mpz_init(tmp);

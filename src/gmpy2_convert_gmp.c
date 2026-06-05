@@ -336,7 +336,7 @@ GMPy_MPZ_From_Integer(PyObject *obj, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpz");
+    TYPE_ERROR("cannot convert object to 'mpz'");
     return NULL;
 }
 
@@ -374,7 +374,7 @@ GMPy_MPZ_From_IntegerAndCopy(PyObject *obj, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpz");
+    TYPE_ERROR("cannot convert object to 'mpz'");
     return NULL;
 }
 
@@ -407,7 +407,7 @@ GMPy_MPZ_From_IntegerWithType(PyObject *obj, int xtype, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpz");
+    TYPE_ERROR("cannot convert object to 'mpz'");
     return NULL;
 }
 
@@ -463,7 +463,7 @@ GMPy_MPZ_ConvertArg(PyObject *arg, PyObject **ptr)
         return 1;
     }
     else {
-        TYPE_ERROR("argument can not be converted to 'mpz'");
+        TYPE_ERROR("argument cannot be converted to 'mpz'");
         return 0;
     }
 }
@@ -1046,7 +1046,7 @@ GMPy_MPQ_From_Number(PyObject *obj, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpq");
+    TYPE_ERROR("cannot convert object to 'mpq'");
     return NULL;
 }
 
@@ -1103,7 +1103,7 @@ GMPy_MPQ_From_NumberWithType(PyObject *obj, int xtype, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpq");
+    TYPE_ERROR("cannot convert object to 'mpq'");
     return NULL;
 }
 
@@ -1178,7 +1178,7 @@ GMPy_MPQ_From_Rational(PyObject *obj, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpq");
+    TYPE_ERROR("cannot convert object to 'mpq'");
     return NULL;
 }
 
@@ -1254,7 +1254,7 @@ GMPy_MPQ_From_RationalWithType(PyObject *obj, int xtype, CTXT_Object *context)
     }
 
   error:
-    TYPE_ERROR("cannot convert object to mpq");
+    TYPE_ERROR("cannot convert object to 'mpq'");
     return NULL;
 }
 
@@ -1276,7 +1276,7 @@ GMPy_MPQ_ConvertArg(PyObject *arg, PyObject **ptr)
     }
     else {
         if (!PyErr_Occurred()) {
-            TYPE_ERROR("argument can not be converted to 'mpq'");
+            TYPE_ERROR("argument cannot be converted to 'mpq'");
         }
         return 0;
     }

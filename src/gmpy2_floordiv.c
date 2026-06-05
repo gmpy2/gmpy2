@@ -282,7 +282,7 @@ static PyObject *
 GMPy_Complex_FloorDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
                          CTXT_Object *context)
 {
-    TYPE_ERROR("can't take floor of complex number");
+    TYPE_ERROR("cannot take floor of complex number");
     return NULL;
 }
 

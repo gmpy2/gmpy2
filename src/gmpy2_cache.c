@@ -134,7 +134,7 @@ GMPy_MPZ_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
                 return out;
             if (!MPZ_Check(out)) {
                 PyErr_Format(PyExc_TypeError,
-                             "object of type '%.200s' can not be interpreted as mpz",
+                             "object of type '%.200s' cannot be interpreted as 'mpz'",
                              Py_TYPE(out)->tp_name);
                 Py_DECREF(out);
                 return NULL;
@@ -570,7 +570,7 @@ GMPy_MPFR_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
             return out;
         if (!MPFR_Check(out)) {
             PyErr_Format(PyExc_TypeError,
-                         "object of type '%.200s' can not be interpreted as mpfr",
+                         "object of type '%.200s' cannot be interpreted as 'mpfr'",
                          Py_TYPE(out)->tp_name);
             Py_DECREF(out);
             return NULL;
@@ -761,7 +761,7 @@ GMPy_MPC_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
             return out;
         if (!MPC_Check(out)) {
             PyErr_Format(PyExc_TypeError,
-                         "object of type '%.200s' can not be interpreted as mpc",
+                         "object of type '%.200s' cannot be interpreted as 'mpc'",
                          Py_TYPE(out)->tp_name);
             Py_DECREF(out);
             return NULL;

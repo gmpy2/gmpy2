@@ -711,12 +711,12 @@ GMPy_MPQ_From_MPFR(MPFR_Object *self, CTXT_Object *context)
     CHECK_CONTEXT(context);
 
     if (mpfr_nan_p(self->f)) {
-        VALUE_ERROR("can not convert NaN to MPQ");
+        VALUE_ERROR("cannot convert NaN to 'mpq'");
         return NULL;
     }
 
     if (mpfr_inf_p(self->f)) {
-        OVERFLOW_ERROR("can not convert Infinity to MPQ");
+        OVERFLOW_ERROR("cannot convert Infinity to 'mpq'");
         return NULL;
     }
 
@@ -848,7 +848,7 @@ GMPy_MPFR_ConvertArg(PyObject *arg, PyObject **ptr)
         return 1;
     }
     else {
-        TYPE_ERROR("argument can not be converted to 'mpfr'");
+        TYPE_ERROR("argument cannot be converted to 'mpfr'");
         return 0;
     }
 }

@@ -339,7 +339,7 @@ static PyObject *
 GMPy_Complex_DivModWithType(PyObject *x, int xtype, PyObject *y, int ytype,
                             CTXT_Object *context)
 {
-    TYPE_ERROR("can't take floor or mod of complex number.");
+    TYPE_ERROR("cannot take floor or mod of complex number");
     return NULL;
 }
 
