@@ -463,7 +463,7 @@ GMPy_MPZ_ConvertArg(PyObject *arg, PyObject **ptr)
         return 1;
     }
     else {
-        TYPE_ERROR("argument cannot be converted to 'mpz'");
+        TYPE_ERROR("cannot convert argument to 'mpz'");
         return 0;
     }
 }
@@ -1276,7 +1276,7 @@ GMPy_MPQ_ConvertArg(PyObject *arg, PyObject **ptr)
     }
     else {
         if (!PyErr_Occurred()) {
-            TYPE_ERROR("argument cannot be converted to 'mpq'");
+            TYPE_ERROR("cannot convert argument to 'mpq'");
         }
         return 0;
     }

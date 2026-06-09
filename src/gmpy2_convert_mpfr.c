@@ -848,7 +848,7 @@ GMPy_MPFR_ConvertArg(PyObject *arg, PyObject **ptr)
         return 1;
     }
     else {
-        TYPE_ERROR("argument cannot be converted to 'mpfr'");
+        TYPE_ERROR("cannot convert argument to 'mpfr'");
         return 0;
     }
 }

@@ -584,7 +584,7 @@ GMPy_MPC_ConvertArg(PyObject *arg, PyObject **ptr)
         return 1;
     }
     else {
-        TYPE_ERROR("argument cannot be converted to 'mpc'");
+        TYPE_ERROR("cannot convert argument to 'mpc'");
         return 0;
     }
 }
