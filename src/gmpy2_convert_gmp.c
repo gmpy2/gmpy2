@@ -962,7 +962,7 @@ GMPy_MPQ_From_Fraction(PyObject* obj, CTXT_Object *context)
     num = PyObject_GetAttrString(obj, "numerator");
     den = PyObject_GetAttrString(obj, "denominator");
     if (!num || !PyLong_Check(num) || !den || !PyLong_Check(den)) {
-        SYSTEM_ERROR("Object does not appear to be Fraction");
+        SYSTEM_ERROR("object does not appear to be Fraction");
         goto error;
     }
     if (mpz_set_PyLong(mpq_numref(result->q), num)) {

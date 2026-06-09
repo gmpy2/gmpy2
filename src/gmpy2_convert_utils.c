@@ -208,7 +208,7 @@ GMPy_Integer_AsMpBitCnt(PyObject *x)
         return GMPy_Integer_AsUnsignedLongLong(x);
     if(sizeof(mp_bitcnt_t) == sizeof(unsigned long))
         return GMPy_Integer_AsUnsignedLong(x);
-    SYSTEM_ERROR("Unexpected sizes in GMPy_Integer_AsMpBitCnt.");
+    SYSTEM_ERROR("unexpected sizes in GMPy_Integer_AsMpBitCnt.");
 }
 
 static mp_bitcnt_t
@@ -218,7 +218,7 @@ GMPy_PyLong_AsMpBitCnt(PyObject *x)
         return PyLong_AsUnsignedLongLong(x);
     if(sizeof(mp_bitcnt_t) == sizeof(unsigned long))
         return PyLong_AsUnsignedLong(x);
-    SYSTEM_ERROR("Unexpected sizes in GMPy_PyLong_AsMpBitCnt.");
+    SYSTEM_ERROR("unexpected sizes in GMPy_PyLong_AsMpBitCnt.");
 }
 
 static PyObject *
@@ -228,7 +228,7 @@ GMPy_PyLong_FromMpBitCnt(mp_bitcnt_t n)
         return PyLong_FromUnsignedLongLong((unsigned long long)n);
     if(sizeof(mp_bitcnt_t) == sizeof(unsigned long))
         return PyLong_FromUnsignedLong((unsigned long)n);
-    SYSTEM_ERROR("Unexpected sizes in GMPy_PyLong_FromMpBitCnt.");
+    SYSTEM_ERROR("unexpected sizes in GMPy_PyLong_FromMpBitCnt.");
 }
 static unsigned PY_LONG_LONG
 GMPy_Integer_AsUnsignedLongLongWithType(PyObject *x, int xtype)

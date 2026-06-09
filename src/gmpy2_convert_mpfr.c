@@ -552,12 +552,12 @@ stern_brocot(MPFR_Object* self, MPFR_Object *err, mpfr_prec_t bits, int mayz, CT
     mpfr_t f, al, a, r1[3], r2[3], temperr, minerr, curerr, newerr, temp;
 
     if (mpfr_nan_p(self->f)) {
-        VALUE_ERROR("Cannot convert NaN to a number.");
+        VALUE_ERROR("cannot convert NaN to a number.");
         return NULL;
     }
 
     if (mpfr_inf_p(self->f)) {
-        OVERFLOW_ERROR("Cannot convert Infinity to a number.");
+        OVERFLOW_ERROR("cannot convert Infinity to a number.");
         return NULL;
     }
 
@@ -577,7 +577,7 @@ stern_brocot(MPFR_Object* self, MPFR_Object *err, mpfr_prec_t bits, int mayz, CT
 
     errsign = mpfr_sgn(temperr);
     if (errsign <= 0 && (bits < 2 || bits > mpfr_get_prec(self->f))) {
-        VALUE_ERROR("Requested precision out-of-bounds.");
+        VALUE_ERROR("requested precision out-of-bounds.");
         mpfr_clear(temperr);
         return NULL;
     }
@@ -592,7 +592,7 @@ stern_brocot(MPFR_Object* self, MPFR_Object *err, mpfr_prec_t bits, int mayz, CT
         mpfr_floor(temperr, temperr);
         ubits = mpfr_get_si(temperr, MPFR_RNDN);
         if (ubits < 2 || ubits > mpfr_get_prec(self->f)) {
-            VALUE_ERROR("Requested precision out-of-bounds.");
+            VALUE_ERROR("requested precision out-of-bounds.");
             mpfr_clear(temperr);
             return NULL;
         }
@@ -823,7 +823,7 @@ GMPy_PyStr_From_MPFR(MPFR_Object *self, int base, int digits, CTXT_Object *conte
     /* obtain digits-string and exponent */
     buffer = mpfr_get_str(0, &the_exp, base, digits, self->f, GET_MPFR_ROUND(context));
     if (!*buffer) {
-        SYSTEM_ERROR("Internal error in Pympfr_To_PyStr");
+        SYSTEM_ERROR("internal error in Pympfr_To_PyStr");
         return NULL;
     }
 
@@ -920,7 +920,7 @@ mpfr_ascii(mpfr_t self, int base, int digits, int round)
     /* obtain digits-string and exponent */
     buffer = mpfr_get_str(0, &the_exp, base, digits, self, round);
     if (!*buffer) {
-        SYSTEM_ERROR("Internal error in mpfr_ascii");
+        SYSTEM_ERROR("internal error in mpfr_ascii");
         return NULL;
     }
 

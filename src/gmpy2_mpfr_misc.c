@@ -436,12 +436,12 @@ GMPy_MPFR_Integer_Ratio_Method(PyObject *self, PyObject *args)
     CHECK_CONTEXT(context);
 
     if (mpfr_nan_p(MPFR(self))) {
-        VALUE_ERROR("Cannot pass NaN to mpfr.as_integer_ratio.");
+        VALUE_ERROR("cannot pass NaN to mpfr.as_integer_ratio.");
         return NULL;
     }
 
     if (mpfr_inf_p(MPFR(self))) {
-        OVERFLOW_ERROR("Cannot pass Infinity to mpfr.as_integer_ratio.");
+        OVERFLOW_ERROR("cannot pass Infinity to mpfr.as_integer_ratio.");
         return NULL;
     }
 
@@ -497,12 +497,12 @@ GMPy_MPFR_Mantissa_Exp_Method(PyObject *self, PyObject *args)
     CHECK_CONTEXT(context);
 
     if (mpfr_nan_p(MPFR(self))) {
-        VALUE_ERROR("Cannot pass NaN to mpfr.as_mantissa_exp.");
+        VALUE_ERROR("cannot pass NaN to mpfr.as_mantissa_exp.");
         return NULL;
     }
 
     if (mpfr_inf_p(MPFR(self))) {
-        OVERFLOW_ERROR("Cannot pass Infinity to mpfr.as_mantissa_exp.");
+        OVERFLOW_ERROR("cannot pass Infinity to mpfr.as_mantissa_exp.");
         return NULL;
     }
 

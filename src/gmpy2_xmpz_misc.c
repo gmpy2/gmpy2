@@ -390,7 +390,7 @@ GMPy_Iter_Next(GMPy_Iter_Object *self) {
             }
             break;
         default:
-            SYSTEM_ERROR("Illegal iter_type in gmpy2.Iterator.");
+            SYSTEM_ERROR("illegal iter_type in gmpy2.Iterator.");
     }
     return result;
 }

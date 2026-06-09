@@ -558,14 +558,14 @@ gmpy_exec(PyObject *gmpy_module)
 
     if (sizeof(mpfr_prec_t) != sizeof(long)) {
         /* LCOV_EXCL_START */
-        SYSTEM_ERROR("Size of mpfr_prec_t and long not compatible");
+        SYSTEM_ERROR("size of mpfr_prec_t and long not compatible");
         return -1;;
         /* LCOV_EXCL_STOP */
     }
 
     if (sizeof(mpfr_exp_t) != sizeof(long)) {
         /* LCOV_EXCL_START */
-        SYSTEM_ERROR("Size of mpfr_exp_t and long not compatible");
+        SYSTEM_ERROR("size of mpfr_exp_t and long not compatible");
         return -1;;
         /* LCOV_EXCL_STOP */
     }

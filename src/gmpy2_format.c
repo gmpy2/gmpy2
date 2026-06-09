@@ -61,7 +61,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
     for (p1 = (unsigned char*)fmtcode; *p1 != '\00'; p1++) {
         if (*p1 == '<' || *p1 == '>' || *p1 == '^') {
             if (seenalign || seensign || seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -72,7 +72,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '+') {
             if (seensign || seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -83,7 +83,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '-') {
             if (seensign || seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -93,7 +93,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == ' ') {
             if (seensign || seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -104,7 +104,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '#') {
             if (seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -227,7 +227,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     for (p1 = (unsigned char*)fmtcode; *p1 != '\00'; p1++) {
         if (*p1 == '<' || *p1 == '>' || *p1 == '^') {
             if (seenalign || seensign || seendecimal || seendigits || seenround || seenindicator) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -238,7 +238,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '+' || *p1 == ' ') {
             if (seensign || seendecimal || seendigits || seenround || seenindicator) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -249,7 +249,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '-') {
             if (seensign || seendecimal || seendigits || seenround || seenindicator) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -259,7 +259,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '#') {
             if (seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -270,7 +270,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (*p1 == '.') {
             if (seendecimal || seendigits || seenround) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -281,7 +281,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (isdigit(*p1)) {
             if (seendigits || seenround) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else if (seendecimal) {
@@ -323,7 +323,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         if (*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
             *p1 == 'N' ) {
             if (seenround) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -359,7 +359,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
             seenconv = 1;
             break;
         }
-        VALUE_ERROR("Invalid conversion specification");
+        VALUE_ERROR("invalid conversion specification");
         return NULL;
     }
 
@@ -401,7 +401,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     }
 
     if (buflen == -1) {
-        RUNTIME_ERROR("The maximum precision for string formatting "
+        RUNTIME_ERROR("the maximum precision for string formatting "
                       "exceeded. Please use digits() method instead.");
         return NULL;
     }
@@ -478,7 +478,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
             if (seenalign || seensign || seendecimal || seendigits ||
                 seenround || seenstyle || seenindicator)
             {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -491,7 +491,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
             if (seensign || seendecimal || seendigits || seenround ||
                 seenstyle || seenindicator)
             {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -508,7 +508,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (*p == '#') {
             if (seenindicator || seendigits) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -520,7 +520,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (*p == '.') {
             if (seendecimal == 2 || seendigits || seenround || seenstyle) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -538,7 +538,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (isdigit(*p)) {
             if (seendigits || seenround || seenstyle) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else if (seendecimal == 1) {
@@ -594,7 +594,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         if (*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
             *p == 'N' ) {
             if (seenround || seenstyle) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -606,7 +606,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (*p == 'P' || *p == 'M') {
             if (seenstyle) {
-                VALUE_ERROR("Invalid conversion specification");
+                VALUE_ERROR("invalid conversion specification");
                 return NULL;
             }
             else {
@@ -650,7 +650,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
             seenconv = 1;
             break;
         }
-        VALUE_ERROR("Invalid conversion specification");
+        VALUE_ERROR("invalid conversion specification");
         return NULL;
     }
 
@@ -691,7 +691,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
 
     if (rbuflen < 0) {
         mpfr_free_str(realbuf);
-        SYSTEM_ERROR("Internal error in mpfr_asprintf");
+        SYSTEM_ERROR("internal error in mpfr_asprintf");
         return NULL;
     }
 
@@ -704,7 +704,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         else {
             mpfr_free_str(realbuf);
-            VALUE_ERROR("Invalid conversion specification for imag");
+            VALUE_ERROR("invalid conversion specification for imag");
             return NULL;
         }
     }
@@ -714,7 +714,7 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
     if (ibuflen < 0) {
         mpfr_free_str(realbuf);
         mpfr_free_str(imagbuf);
-        SYSTEM_ERROR("Internal error in mpfr_asprintf");
+        SYSTEM_ERROR("internal error in mpfr_asprintf");
         return NULL;
     }
 

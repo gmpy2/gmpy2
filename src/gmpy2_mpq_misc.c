@@ -383,7 +383,7 @@ GMPy_MPQ_Method_Round(PyObject *self, PyObject *args)
     }
 
     if (PyTuple_GET_SIZE(args) > 1) {
-        TYPE_ERROR("Too many arguments for __round__()");
+        TYPE_ERROR("too many arguments for __round__()");
         return NULL;
     }
 
