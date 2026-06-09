@@ -995,7 +995,7 @@ GMPy_MPZ_Function_Invert(PyObject *self, PyObject * const *args,
 
     if (MPZ_Check(x) && MPZ_Check(y)) {
         if (mpz_sgn(MPZ(y)) == 0) {
-            ZERO_ERROR("invert() division by 0");
+            ZERO_ERROR("invert() division by zero");
             Py_DECREF((PyObject*)result);
             return NULL;
         }
@@ -1019,7 +1019,7 @@ GMPy_MPZ_Function_Invert(PyObject *self, PyObject * const *args,
             return NULL;
         }
         if (mpz_sgn(tempy->z) == 0) {
-            ZERO_ERROR("invert() division by 0");
+            ZERO_ERROR("invert() division by zero");
             Py_DECREF((PyObject*)tempx);
             Py_DECREF((PyObject*)tempy);
             Py_DECREF(result);
@@ -1065,7 +1065,7 @@ GMPy_MPZ_Function_Divexact(PyObject *self, PyObject * const *args,
 
     if (MPZ_Check(x) && MPZ_Check(y)) {
         if (mpz_sgn(MPZ(y)) == 0) {
-            ZERO_ERROR("divexact() division by 0");
+            ZERO_ERROR("divexact() division by zero");
             Py_DECREF((PyObject*)result);
             return NULL;
         }
@@ -1082,7 +1082,7 @@ GMPy_MPZ_Function_Divexact(PyObject *self, PyObject * const *args,
             return NULL;
         }
         if (mpz_sgn(MPZ(tempy)) == 0) {
-            ZERO_ERROR("divexact() division by 0");
+            ZERO_ERROR("divexact() division by zero");
             Py_DECREF((PyObject*)tempx);
             Py_DECREF((PyObject*)tempy);
             Py_DECREF((PyObject*)result);

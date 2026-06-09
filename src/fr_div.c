@@ -237,7 +237,7 @@ _mpc_fr_div (mpc_ptr a, mpfr_srcptr b, mpc_srcptr c, mpc_rnd_t rnd)
       be called nan.
       By G.5.1.4, infinite/finite=infinite; finite/infinite=0;
       all other divisions that are not finite/finite return nan+i*nan.
-      Division by 0 could be handled by the following case of division by
+      Division by zero could be handled by the following case of division by
       a real; we handle it separately instead. See also
       https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1399.htm */
    if (mpc_zero_p (c)) /* both Re(c) and Im(c) are zero */
@@ -292,7 +292,7 @@ _mpc_fr_div (mpc_ptr a, mpfr_srcptr b, mpc_srcptr c, mpc_rnd_t rnd)
       overflow_norm = mpfr_overflow_p ();
       if (underflow_norm)
          mpfr_set_ui (q, 0ul, MPFR_RNDN);
-         /* to obtain divisions by 0 later on */
+         /* to obtain divisions by zero later on */
 
       /* now compute b*conjugate(c) */
       mpfr_clear_underflow ();

@@ -769,7 +769,7 @@ PyDoc_STRVAR(GMPy_doc_CTXT_erange,
 
 PyDoc_STRVAR(GMPy_doc_CTXT_trap_divzero,
 "This attribute controls whether or not a `DivisionByZeroError` exception\n"
-"is raised if division by 0 occurs.  The `DivisionByZeroError` is a\n"
+"is raised if division by zero occurs.  The `DivisionByZeroError` is a\n"
 "sub-class of Python’s `ZeroDivisionError`.");
 
 PyDoc_STRVAR(GMPy_doc_CTXT_divzero,

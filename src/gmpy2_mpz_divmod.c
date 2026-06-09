@@ -60,7 +60,7 @@ GMPy_MPZ_c_divmod(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("c_divmod() division by 0");
+        ZERO_ERROR("c_divmod() division by zero");
         goto err;
     }
 
@@ -104,7 +104,7 @@ GMPy_MPZ_c_div(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("c_div() division by 0");
+        ZERO_ERROR("c_div() division by zero");
         goto err;
     }
 
@@ -144,7 +144,7 @@ GMPy_MPZ_c_mod(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("c_mod() division by 0");
+        ZERO_ERROR("c_mod() division by zero");
         goto err;
     }
 
@@ -194,7 +194,7 @@ GMPy_MPZ_f_divmod(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("f_divmod() division by 0");
+        ZERO_ERROR("f_divmod() division by zero");
         goto err;
     }
 
@@ -238,7 +238,7 @@ GMPy_MPZ_f_div(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("f_div() division by 0");
+        ZERO_ERROR("f_div() division by zero");
         goto err;
     }
 
@@ -278,7 +278,7 @@ GMPy_MPZ_f_mod(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("f_mod() division by 0");
+        ZERO_ERROR("f_mod() division by zero");
         goto err;
     }
 
@@ -328,7 +328,7 @@ GMPy_MPZ_t_divmod(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("t_divmod() division by 0");
+        ZERO_ERROR("t_divmod() division by zero");
         goto err;
     }
 
@@ -375,7 +375,7 @@ GMPy_MPZ_t_div(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("t_div() division by 0");
+        ZERO_ERROR("t_div() division by zero");
         goto err;
     }
 
@@ -415,7 +415,7 @@ GMPy_MPZ_t_mod(PyObject *self, PyObject *args)
     }
 
     if (mpz_sgn(tempy->z) == 0) {
-        ZERO_ERROR("t_mod() division by 0");
+        ZERO_ERROR("t_mod() division by zero");
         goto err;
     }
 
