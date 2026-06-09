@@ -291,7 +291,7 @@ static PyObject *
 GMPy_Complex_ModWithType(PyObject *x, int xtype, PyObject *y, int ytype,
                          CTXT_Object *context)
 {
-    TYPE_ERROR("can't take mod of complex number");
+    TYPE_ERROR("cannot take mod of complex number");
     return NULL;
 }
 
