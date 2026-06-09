@@ -220,7 +220,7 @@ GMPy_MPFR_From_MPZ(MPZ_Object *obj, mpfr_prec_t prec, CTXT_Object *context)
             bitlen = MPFR_PREC_MIN;
 	}
 	if (bitlen > MPFR_PREC_MAX) {
-	    OVERFLOW_ERROR("'mpz' to large to convert to 'mpfr'\n");
+	    OVERFLOW_ERROR("'mpz' too large to convert to 'mpfr'\n");
 	    return NULL;
 	}
 	prec = (mpfr_prec_t)bitlen;

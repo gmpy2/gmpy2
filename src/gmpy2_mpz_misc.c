@@ -789,7 +789,7 @@ GMPy_MPZ_Function_Bincoef(PyObject *self, PyObject * const *args,
     unsigned long n, k;
 
     if (nargs != 2) {
-        TYPE_ERROR("bincoef() requires two integer arguments");
+        TYPE_ERROR("bincoef() requires 2 integer arguments");
         return NULL;
     }
 

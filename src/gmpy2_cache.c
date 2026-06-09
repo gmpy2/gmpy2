@@ -73,7 +73,7 @@ GMPy_MPZ_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
     CTXT_Object *context = NULL;
 
     if (type != &MPZ_Type) {
-        TYPE_ERROR("mpz.__new__() requires mpz type");
+        TYPE_ERROR("mpz.__new__() requires 'mpz' type");
         return NULL;
     }
 
@@ -358,7 +358,7 @@ GMPy_MPQ_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
     CTXT_Object *context = NULL;
 
     if (type != &MPQ_Type) {
-        TYPE_ERROR("mpq.__new__() requires mpq type");
+        TYPE_ERROR("mpq.__new__() requires 'mpq' type");
         return NULL;
     }
 
@@ -507,7 +507,7 @@ GMPy_MPFR_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
     static char *kwlist_n[] = {"", "precision", "context", NULL};
 
     if (type != &MPFR_Type) {
-        TYPE_ERROR("mpfr.__new__() requires mpfr type");
+        TYPE_ERROR("mpfr.__new__() requires 'mpfr' type");
         return NULL;
     }
 
@@ -677,7 +677,7 @@ GMPy_MPC_NewInit(PyTypeObject *type, PyObject *args, PyObject *keywds)
     static char *kwlist_s[] = {"", "precision", "base", "context", NULL};
 
     if (type != &MPC_Type) {
-        TYPE_ERROR("mpc.__new__() requires mpc type");
+        TYPE_ERROR("mpc.__new__() requires 'mpc' type");
         return NULL;
     }
 

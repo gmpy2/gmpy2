@@ -50,7 +50,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
     int seensign = 0, seenindicator = 0, seenalign = 0, seendigits = 0;
 
     if (!CHECK_MPZANY(self)) {
-        TYPE_ERROR("requires mpz type");
+        TYPE_ERROR("requires 'mpz' type");
         return NULL;
     }
 
@@ -213,7 +213,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     ctx_round = GET_MPFR_ROUND(context);
 
     if (!MPFR_Check(self)) {
-        TYPE_ERROR("requires mpfr type");
+        TYPE_ERROR("requires 'mpfr' type");
         return NULL;
     }
 
