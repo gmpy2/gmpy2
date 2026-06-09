@@ -433,7 +433,7 @@ GMPy_MPFR_From_RealWithType(PyObject *obj, int xtype, mp_prec_t prec, CTXT_Objec
     }
 
   error:
-    TYPE_ERROR("object could not be converted to 'mpfr'");
+    TYPE_ERROR("cannot convert object to 'mpfr'");
     return NULL;
 }
 

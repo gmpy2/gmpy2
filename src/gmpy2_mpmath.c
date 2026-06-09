@@ -86,7 +86,7 @@ mpmath_get_sign(PyObject *x)
         }
     }
 
-    TYPE_ERROR("could not convert object to integer");
+    TYPE_ERROR("cannot convert object to integer");
     return (long)-1;
 }
 
@@ -293,7 +293,7 @@ Pympz_mpmath_create_fast(PyObject *self, PyObject *const *args, Py_ssize_t nargs
         case 3:
             prec = GMPy_Integer_AsLong(args[2]);
             if (prec == (mp_bitcnt_t)(-1)) {
-                VALUE_ERROR("could not convert prec to positive int");
+                VALUE_ERROR("cannot convert prec to positive int");
                 return NULL;
             }
             /* fallthrough */

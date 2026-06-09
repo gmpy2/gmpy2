@@ -460,7 +460,7 @@ GMPy_MPC_From_ComplexWithType(PyObject* obj, int xtype, mp_prec_t rprec,
     }
 
   error:
-    TYPE_ERROR("object could not be converted to 'mpc'");
+    TYPE_ERROR("cannot convert object to 'mpc'");
     return NULL;
 }
 
