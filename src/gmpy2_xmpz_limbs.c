@@ -89,7 +89,7 @@ PyDoc_STRVAR(GMPy_doc_xmpz_method_limbs_finish,
 static PyObject* GMPy_XMPZ_Method_LimbsFinish(PyObject* obj, PyObject* other)
 {
     if (!PyLong_Check(other)) {
-        TYPE_ERROR("number of limbs must be an int or long");
+        TYPE_ERROR("number of limbs must be an int or a long");
         return NULL;
     }
     else {

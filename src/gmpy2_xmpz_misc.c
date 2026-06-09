@@ -154,7 +154,7 @@ GMPy_XMPZ_Method_SubScript(XMPZ_Object* self, PyObject* item)
 
         i = PyLong_AsSsize_t(item);
         if (i == -1 && PyErr_Occurred()) {
-            INDEX_ERROR("argument too large to be converted to an index");
+            INDEX_ERROR("argument too large to convert to an index");
             return NULL;
         }
         if (i < 0) {
@@ -208,7 +208,7 @@ GMPy_XMPZ_Method_AssignSubScript(XMPZ_Object* self, PyObject* item, PyObject* va
 
         i = PyLong_AsSsize_t(item);
         if (i == -1 && PyErr_Occurred()) {
-            INDEX_ERROR("argument too large to be converted to an index");
+            INDEX_ERROR("argument too large to convert to an index");
             return -1;
         }
         if (i < 0) {

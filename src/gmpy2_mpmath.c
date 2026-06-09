@@ -127,7 +127,7 @@ Pympz_mpmath_normalize_fast(PyObject *self, PyObject *const *args, Py_ssize_t na
     if (!MPZ_Check(man)) {
         /* Try to convert to an mpz... */
         if (!(man = GMPy_MPZ_From_Integer((PyObject*)man, NULL))) {
-            TYPE_ERROR("argument is not an mpz");
+            TYPE_ERROR("argument must be an 'mpz'");
             return NULL;
         }
     }
@@ -282,7 +282,7 @@ Pympz_mpmath_create_fast(PyObject *self, PyObject *const *args, Py_ssize_t nargs
     Py_UCS4 rnd = (Py_UCS4)'f';
 
     if (nargs < 2) {
-        TYPE_ERROR("mpmath_create() expects 'mpz','int'[,'int','str'] arguments");
+        TYPE_ERROR("mpmath_create() requires 'mpz','int'[,'int','str'] arguments");
         return NULL;
     }
 
@@ -303,7 +303,7 @@ Pympz_mpmath_create_fast(PyObject *self, PyObject *const *args, Py_ssize_t nargs
         case 1:
             man = GMPy_MPZ_From_Integer(args[0], NULL);
             if (!man) {
-                TYPE_ERROR("mpmath_create() expects 'mpz','int'[,'int','str'] arguments");
+                TYPE_ERROR("mpmath_create() requires 'mpz','int'[,'int','str'] arguments");
                 return NULL;
             }
     }
