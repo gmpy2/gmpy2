@@ -229,6 +229,8 @@ def test_mpc_format():
     gmpy2.set_context(gmpy2.context(round=gmpy2.RoundUp))
     assert f'{c:.2f}' == '2.68+0.00j'
 
+    pytest.raises(ValueError, lambda: format(mpc(1), "1" + "0"*70))
+
 
 def test_mpc_repr():
     c = mpc('1.2999999999999999999999999999994-4.7000000000000000000000000000000025j',(100,110))

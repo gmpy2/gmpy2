@@ -666,6 +666,8 @@ def test_mpz_format():
     gmpy2.set_context(gmpy2.ieee(64))
     assert '{:f}'.format(a<<1024) == 'inf'
 
+    raises(ValueError, lambda: format(mpz(1), "1" + "0"*70))
+
 
 def test_mpz_digits():
     z1, z2 = mpz(-3), mpz(15)
