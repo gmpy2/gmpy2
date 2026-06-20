@@ -66,7 +66,7 @@ xfail_strict = true
 
 [tool.cibuildwheel]
 build-frontend = {name="build", args=["--verbose"]}
-enable = "pypy cpython-prerelease cpython-freethreading"
+enable = "pypy cpython-prerelease"
 before-all = "bash scripts/cibw_before_all.sh"
 test-extras = "tests"
 test-command = """pytest {package}/test && \
