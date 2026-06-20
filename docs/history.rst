@@ -3,6 +3,15 @@ Release Notes
 
 .. currentmodule:: gmpy2
 
+Changes in gmpy2 2.3.1
+----------------------
+
+* Fix ieee() for bit width > 128. (skirpichev)
+* Fix ``Fix mpc.__module__``. (skirpichev)
+* Check for buffer overflows in __format__() dunders. (skirpichev)
+* Support CPython v3.15. (skirpichev)
+* Drop additional constraint for Jacobi symbol. (skirpichev)
+
 Changes in gmpy2 2.3.0
 ----------------------
 
