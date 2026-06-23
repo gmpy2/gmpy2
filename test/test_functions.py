@@ -1595,11 +1595,11 @@ def test_iroot_rem():
 
 def test_jacobi():
     pytest.raises(TypeError, lambda: jacobi('a', 10))
-    pytest.raises(ValueError, lambda: jacobi(10,-3))
     pytest.raises(TypeError, lambda: jacobi(3))
     pytest.raises(TypeError, lambda: jacobi())
 
-    assert jacobi(10,3) == 1
+    assert jacobi(10, 3) == 1
+    assert jacobi(10, -3) == 1
 
 
 def test_kronecker():
