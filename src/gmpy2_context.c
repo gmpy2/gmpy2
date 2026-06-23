@@ -283,7 +283,7 @@ GMPy_CTXT_ieee(PyObject *self, PyObject *args, PyObject *kwargs)
     return (PyObject*)result;
 }
 
-/* Helper function to convert to convert a rounding mode to a string. */
+/* Helper function to convert a rounding mode to a string. */
 
 static PyObject *
 _round_to_name(int val)

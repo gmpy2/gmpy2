@@ -4,7 +4,7 @@ set -e -x
 
 GMP_VERSION=6.3.0
 MPFR_VERSION=4.2.2
-MPC_VERSION=1.3.1
+MPC_VERSION=1.4.0
 
 PREFIX="$(pwd)/.local/"
 
@@ -65,11 +65,9 @@ make -j6
 make install
 cd ../
 # -- build MPC --
-download https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.gz
-tar -xf mpc-${MPC_VERSION}.tar.gz
+download https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.xz
+tar -xf mpc-${MPC_VERSION}.tar.xz
 cd mpc-${MPC_VERSION}
-
-patch -N -Z -p1 < ../scripts/mpc-pkg-config.diff
 
 ./configure --enable-shared \
             --disable-static \

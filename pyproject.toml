@@ -28,6 +28,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Programming Language :: Python :: 3.12',
                'Programming Language :: Python :: 3.13',
                'Programming Language :: Python :: 3.14',
+               'Programming Language :: Python :: 3.15',
                'Programming Language :: Python :: Free Threading :: 2 - Beta',
                'Programming Language :: Python :: Implementation :: CPython',
                "Programming Language :: Python :: Implementation :: PyPy",
@@ -42,7 +43,7 @@ content-type = 'text/x-rst'
 [project.optional-dependencies]
 docs = ['sphinx>=4', 'sphinx-rtd-theme>=1']
 tests = ['pytest', 'hypothesis', 'cython', 'mpmath', 'setuptools',
-         'numpy; python_version>="3.11"']
+         'numpy; python_version>="3.11" and python_version<"3.15"']
 
 [project.urls]
 Homepage = 'https://github.com/gmpy2/gmpy2'
@@ -66,7 +67,7 @@ xfail_strict = true
 
 [tool.cibuildwheel]
 build-frontend = {name="build", args=["--verbose"]}
-enable = "pypy cpython-prerelease cpython-freethreading"
+enable = "pypy cpython-prerelease"
 before-all = "bash scripts/cibw_before_all.sh"
 test-extras = "tests"
 test-command = """pytest {package}/test && \

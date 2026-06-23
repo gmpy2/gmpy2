@@ -361,6 +361,8 @@ def test_mpfr_format():
     gmpy2.set_context(gmpy2.context(round=gmpy2.RoundUp))
     assert f'{r:.2f}' == '2.68'
 
+    pytest.raises(ValueError, lambda: format(mpfr(1), "1" + "0"*70))
+
 
 def test_mpfr_digits():
     r, r2 = mpfr(5.6), mpfr(5)

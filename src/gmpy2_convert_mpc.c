@@ -542,7 +542,7 @@ GMPy_PyStr_From_MPC(MPC_Object *self, int base, int digits, CTXT_Object *context
 static PyObject *
 GMPy_MPC_Float_Slot(PyObject *self)
 {
-    TYPE_ERROR("can't covert 'mpc' to 'float'");
+    TYPE_ERROR("can't convert 'mpc' to float");
     return NULL;
 }
 
@@ -565,7 +565,7 @@ GMPy_PyComplex_From_MPC(PyObject *self, PyObject *other)
 static PyObject *
 GMPy_MPC_Int_Slot(PyObject *self)
 {
-    TYPE_ERROR("can't covert mpc to int");
+    TYPE_ERROR("can't convert 'mpc' to int");
     return NULL;
 }
 

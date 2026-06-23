@@ -59,6 +59,10 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
 
     p2 = (unsigned char*)fmt;
     for (p1 = (unsigned char*)fmtcode; *p1 != '\00'; p1++) {
+        if ((size_t)(p2 - (unsigned char*)fmt) >= sizeof(fmt)) {
+            VALUE_ERROR("too long format string");
+            return NULL;
+        }
         if (*p1 == '<' || *p1 == '>' || *p1 == '^') {
             if (seenalign || seensign || seenindicator || seendigits) {
                 VALUE_ERROR("Invalid conversion specification");
@@ -225,6 +229,13 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     *(p2++) = '%';
 
     for (p1 = (unsigned char*)fmtcode; *p1 != '\00'; p1++) {
+        /* Reserve space for precision value, when it's not specified. */
+        if (((size_t)(p2 - mpfrfmt) > sizeof(mpfrfmt) - 30)
+            || ((size_t)(p3 - fmt) >= sizeof(fmt)))
+        {
+            VALUE_ERROR("too long format string");
+            return NULL;
+        }
         if (*p1 == '<' || *p1 == '>' || *p1 == '^') {
             if (seenalign || seensign || seendecimal || seendigits || seenround || seenindicator) {
                 VALUE_ERROR("Invalid conversion specification");
@@ -445,8 +456,8 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
 {
     PyObject *result = NULL, *tempstr = NULL;
     char *realbuf = 0, *imagbuf = 0, *tempbuf = 0, *fmtcode = 0;
-    char *rfmtptr, *fmtptr;
-    unsigned char *p, *ifmtptr;
+    char *rfmtptr, *fmtptr, *ifmtptr;
+    unsigned char *p;
     char rfmt[100], ifmt[100], fmt[30];
     int rbuflen, ibuflen;
     int seensign = 0, seenalign = 0, seendecimal = 0, seendigits = 0;
@@ -468,12 +479,20 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
     }
 
     rfmtptr = rfmt;
-    ifmtptr = (unsigned char*)ifmt;
+    ifmtptr = ifmt;
     fmtptr = fmt;
     *(rfmtptr++) = '%';
     *(ifmtptr++) = '%';
 
     for (p = (unsigned char*)fmtcode; *p != '\00'; p++) {
+        /* Reserve space for precision value, when it's not specified. */
+        if (((size_t)(rfmtptr - rfmt) > sizeof(rfmt) - 30)
+            || ((size_t)(ifmtptr - ifmt) > sizeof(ifmt) - 30)
+            || ((size_t)(fmtptr - fmt) >= sizeof(fmt)))
+        {
+            VALUE_ERROR("too long format string");
+            return NULL;
+        }
         if (*p == '<' || *p == '>' || *p == '^') {
             if (seenalign || seensign || seendecimal || seendigits ||
                 seenround || seenstyle || seenindicator)

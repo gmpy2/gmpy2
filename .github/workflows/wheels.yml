@@ -34,8 +34,8 @@ jobs:
           path-type: inherit
         if: contains(matrix.os, 'windows')
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
-      - uses: actions/upload-artifact@v6
+        uses: pypa/cibuildwheel@v4.1.0
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-${{ matrix.os }}
           path: ./wheelhouse/
@@ -44,7 +44,7 @@ jobs:
     needs: build_wheels
     steps:
       - name: Merge Wheels
-        uses: actions/upload-artifact/merge@v6
+        uses: actions/upload-artifact/merge@v7
         with:
           name: gmpy2-wheels
           pattern: wheels-*
