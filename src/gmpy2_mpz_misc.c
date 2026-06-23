@@ -1593,7 +1593,7 @@ GMPy_MPZ_Function_PrevPrime(PyObject *self, PyObject *other)
 
 PyDoc_STRVAR(GMPy_doc_mpz_function_jacobi,
 "jacobi($module, x, y, /)\n--\n\n"
-"Return the Jacobi symbol (x|y). y must be odd and >0.");
+"Return the Jacobi symbol (x|y). y must be odd.");
 
 static PyObject *
 GMPy_MPZ_Function_Jacobi(PyObject *self, PyObject *const *args,
@@ -1615,8 +1615,8 @@ GMPy_MPZ_Function_Jacobi(PyObject *self, PyObject *const *args,
         return NULL;
     }
 
-    if (mpz_sgn(tempy->z) <= 0 || mpz_even_p(tempy->z)) {
-        VALUE_ERROR("y must be odd and >0");
+    if (mpz_even_p(tempy->z)) {
+        VALUE_ERROR("y must be odd");
         Py_DECREF((PyObject*)tempx);
         Py_DECREF((PyObject*)tempy);
         return NULL;
