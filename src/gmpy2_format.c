@@ -36,7 +36,7 @@ PyDoc_STRVAR(GMPy_doc_mpz_format,
  * between that head and the digits until the requested field width is reached.
  * This mirrors Python's '=' alignment, which str.__format__() can't do for us. */
 static PyObject *
-GMPy_Format_Pad_Equal(const char *s, long width, char fill)
+GMPy_Format_Pad_Equal(const char *s, Py_ssize_t width, char fill)
 {
     size_t slen = strlen(s);
 
@@ -86,7 +86,7 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
     int base = 10, option = 16;
     int seensign = 0, seenindicator = 0, seenalign = 0, seendigits = 0;
     int seenequal = 0;
-    long equalwidth = 0;
+    Py_ssize_t equalwidth = 0;
     char equalfill = ' ';
 
     if (!CHECK_MPZANY(self)) {
@@ -174,13 +174,21 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
                 if (equalwidth == 0 && equalfill == ' ' && *p1 == '0') {
                     equalfill = '0';
                 }
+                else if (equalwidth > (PY_SSIZE_T_MAX - (*p1 - '0')) / 10) {
+                    VALUE_ERROR("too long format string");
+                    return NULL;
+                }
                 else {
                     equalwidth = equalwidth * 10 + (*p1 - '0');
-                    if (equalwidth > 1000000) {
-                        VALUE_ERROR("too long format string");
-                        return NULL;
-                    }
                 }
+                continue;
+            }
+            if (!seenalign && *p1 == '0') {
+                /* A leading '0' with no explicit alignment is sign-aware
+                   zero-padding, the same as '=' with a '0' fill. */
+                seenalign = 1;
+                seenequal = 1;
+                equalfill = '0';
                 continue;
             }
             if (!seenalign) {
@@ -287,7 +295,7 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     int buflen;
     int seensign = 0, seenalign = 0, seendecimal = 0, seendigits = 0;
     int seenround = 0, seenconv = 0, seenindicator = 0, seenequal = 0;
-    long equalwidth = 0;
+    Py_ssize_t equalwidth = 0;
     char equalfill = ' ';
     CTXT_Object *context = NULL;
     mpfr_rnd_t ctx_round;
@@ -394,13 +402,21 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
                 if (equalwidth == 0 && equalfill == ' ' && *p1 == '0') {
                     equalfill = '0';
                 }
+                else if (equalwidth > (PY_SSIZE_T_MAX - (*p1 - '0')) / 10) {
+                    VALUE_ERROR("too long format string");
+                    return NULL;
+                }
                 else {
                     equalwidth = equalwidth * 10 + (*p1 - '0');
-                    if (equalwidth > 1000000) {
-                        VALUE_ERROR("too long format string");
-                        return NULL;
-                    }
                 }
+                continue;
+            }
+            else if (!seenalign && *p1 == '0') {
+                /* A leading '0' with no explicit alignment is sign-aware
+                   zero-padding, the same as '=' with a '0' fill. */
+                seenalign = 1;
+                seenequal = 1;
+                equalfill = '0';
                 continue;
             }
             else {

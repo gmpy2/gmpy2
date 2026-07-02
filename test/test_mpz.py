@@ -659,17 +659,16 @@ def test_mpz_format():
 
     assert '{:^#16o}'.format(a) == '     0o173      '
 
-    # issue 505: '=' (sign-aware padding) alignment, matching Python ints
-    assert f"{mpz(255):=10d}" == '       255'
-    assert f"{mpz(-255):=10d}" == '-      255'
-    assert f"{mpz(255):=+10d}" == '+      255'
-    assert f"{mpz(-255):=010d}" == '-000000255'
-    assert f"{mpz(255):= 10d}" == '       255'
-    assert f"{mpz(255):=#010x}" == '0x000000ff'
-    assert f"{mpz(-255):=#010x}" == '-0x00000ff'
-    assert f"{mpz(-255):=#010b}" == '-0b11111111'
-    assert f"{mpz(-255):=#012o}" == '-0o000000377'
-    assert f"{xmpz(-255):=#010x}" == '-0x00000ff'
+    # issue 505: '=' alignment and sign-aware zero-padding should match what a
+    # Python int does, across the sign options, bases and the '#' prefix.
+    values = [255, -255, 0, 7, -7, 1, -1]
+    specs = ['=10d', '=+10d', '= 10d', '=010d', '010d', '+010d', '08d',
+             '=#010x', '#010x', '010x', '=#010o', '#010o', '010o',
+             '=#010b', '#010b', '=#012o', '>08d', '<08d', '^08d']
+    for value in values:
+        for spec in specs:
+            assert format(mpz(value), spec) == format(value, spec), (value, spec)
+            assert format(xmpz(value), spec) == format(value, spec), (value, spec)
     assert f"{mpz(255):=10.2f}" == '    255.00'  # float spec still delegates to mpfr
     raises(ValueError, lambda: format(mpz(1), '*=10d'))
     raises(ValueError, lambda: format(mpz(1), "=1" + "0"*70))

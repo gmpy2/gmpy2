@@ -348,16 +348,22 @@ def test_mpfr_format():
     pytest.raises(ValueError, lambda: '{:->}'.format(r))
     pytest.raises(ValueError, lambda: '{:YZ}'.format(r))
 
-    # issue 505: '=' (sign-aware padding) alignment, matching Python floats
-    assert f"{mpfr('123.456'):=.5g}" == '123.46'
-    assert f"{mpfr('123.456'):=10.2f}" == '    123.46'
-    assert f"{mpfr('-123.456'):=10.2f}" == '-   123.46'
-    assert f"{mpfr('123.456'):=+10.2f}" == '+   123.46'
-    assert f"{mpfr('123.456'):=010.2f}" == '0000123.46'
-    assert f"{mpfr('-123.456'):=010.2f}" == '-000123.46'
+    # issue 505: '=' alignment and sign-aware zero-padding should match what
+    # a Python float does. Values keep a fractional part on purpose, so that
+    # gmpy2's habit of appending '.0' to whole numbers doesn't get in the way.
+    values = ['1.1', '-1.1', '123.456', '-123.456', '0.5', '-0.5']
+    specs = ['=10.2f', '=+10.2f', '= 10.2f', '=010.2f', '=.5g', '.5g',
+             '020e', '=020e', '>020e', '<020e', '^020e', '015.4f', '+015.4f',
+             '010.2f', '020.3f', '=020.3f', '020g', '=.2f']
+    for value in values:
+        for spec in specs:
+            assert format(mpfr(value), spec) == format(float(value), spec), (value, spec)
+    assert f"{mpfr(-1.1):020e}" == '-00000001.100000e+00'
     assert f"{mpfr('-inf'):=10.2f}" == '-      inf'
     assert f"{mpfr('nan'):=10.2f}" == '       nan'
-    assert f"{mpfr('123.456'):= 10.2f}" == '    123.46'
+    # whole-number output goes through the '.0' path, then pads sign-aware
+    assert f"{mpfr('123'):=08.0f}" == '000123.0'
+    assert f"{mpfr('-123'):08.0f}" == '-00123.0'
     pytest.raises(ValueError, lambda: format(mpfr(1), '*=10.2f'))
 
     # issue 666
