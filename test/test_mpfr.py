@@ -348,6 +348,18 @@ def test_mpfr_format():
     pytest.raises(ValueError, lambda: '{:->}'.format(r))
     pytest.raises(ValueError, lambda: '{:YZ}'.format(r))
 
+    # issue 505: '=' (sign-aware padding) alignment, matching Python floats
+    assert f"{mpfr('123.456'):=.5g}" == '123.46'
+    assert f"{mpfr('123.456'):=10.2f}" == '    123.46'
+    assert f"{mpfr('-123.456'):=10.2f}" == '-   123.46'
+    assert f"{mpfr('123.456'):=+10.2f}" == '+   123.46'
+    assert f"{mpfr('123.456'):=010.2f}" == '0000123.46'
+    assert f"{mpfr('-123.456'):=010.2f}" == '-000123.46'
+    assert f"{mpfr('-inf'):=10.2f}" == '-      inf'
+    assert f"{mpfr('nan'):=10.2f}" == '       nan'
+    assert f"{mpfr('123.456'):= 10.2f}" == '    123.46'
+    pytest.raises(ValueError, lambda: format(mpfr(1), '*=10.2f'))
+
     # issue 666
     r = mpfr('1.5707963267948966')
     assert f'{r:e}' == '1.570796e+00'
@@ -359,6 +371,7 @@ def test_mpfr_format():
     assert f'{r:.2f}' == '2.68'
 
     pytest.raises(ValueError, lambda: format(mpfr(1), "1" + "0"*70))
+    pytest.raises(ValueError, lambda: format(mpfr(1), "=1" + "0"*70))
 
 
 def test_mpfr_digits():

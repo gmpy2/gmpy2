@@ -180,6 +180,38 @@ GMPy_MPZ_Format(PyObject *self, PyObject *args)
         } \
     } while (0);
 
+/* Sign-aware padding for the '=' alignment option. The numeric string 's'
+ * already carries its sign (if any); the fill is inserted between that sign
+ * and the digits until the requested field width is reached. This mirrors
+ * Python's '=' alignment, which str.__format__() can't do for us. */
+static PyObject *
+GMPy_MPFR_Pad_Equal(const char *s, long width, char fill)
+{
+    size_t slen = strlen(s);
+
+    if (width <= 0 || (size_t)width <= slen) {
+        return PyUnicode_FromString(s);
+    }
+
+    size_t pad = (size_t)width - slen;
+    int has_sign = (s[0] == '+' || s[0] == '-' || s[0] == ' ');
+    char *buf = malloc((size_t)width + 1), *q;
+    PyObject *result;
+
+    if (!buf) {
+        return PyErr_NoMemory();
+    }
+    q = buf;
+    if (has_sign) {
+        *(q++) = s[0];
+    }
+    memset(q, fill, pad);
+    strcpy(q + pad, s + has_sign);
+    result = PyUnicode_FromString(buf);
+    free(buf);
+    return result;
+}
+
 PyDoc_STRVAR(GMPy_doc_mpfr_format,
 "__format__($self, fmt, /)\n--\n\n"
 "Return a Python string by formatting self using the format string 'fmt'.\n\n"
@@ -209,7 +241,9 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
     char mpfrfmt[100], fmt[30];
     int buflen;
     int seensign = 0, seenalign = 0, seendecimal = 0, seendigits = 0;
-    int seenround = 0, seenconv = 0, seenindicator = 0;
+    int seenround = 0, seenconv = 0, seenindicator = 0, seenequal = 0;
+    long equalwidth = 0;
+    char equalfill = ' ';
     CTXT_Object *context = NULL;
     mpfr_rnd_t ctx_round;
 
@@ -244,6 +278,17 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
             else {
                 *(p3++) = *p1;
                 seenalign = 1;
+                continue;
+            }
+        }
+        if (*p1 == '=') {
+            if (seenalign || seensign || seendecimal || seendigits || seenround || seenindicator) {
+                VALUE_ERROR("Invalid conversion specification");
+                return NULL;
+            }
+            else {
+                seenalign = 1;
+                seenequal = 1;
                 continue;
             }
         }
@@ -297,6 +342,20 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
             }
             else if (seendecimal) {
                 *(p2++) = *p1;
+                continue;
+            }
+            else if (seenequal) {
+                /* A leading '0' selects zero fill; the rest is the width. */
+                if (equalwidth == 0 && equalfill == ' ' && *p1 == '0') {
+                    equalfill = '0';
+                }
+                else {
+                    equalwidth = equalwidth * 10 + (*p1 - '0');
+                    if (equalwidth > 1000000) {
+                        VALUE_ERROR("too long format string");
+                        return NULL;
+                    }
+                }
                 continue;
             }
             else {
@@ -429,11 +488,13 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         strcat(newbuf, buffer);
         strcat(newbuf, ".0");
         mpfr_free_str(buffer);
-        mpfrstr = PyUnicode_FromString(newbuf);
+        mpfrstr = seenequal ? GMPy_MPFR_Pad_Equal(newbuf, equalwidth, equalfill)
+                            : PyUnicode_FromString(newbuf);
         free(newbuf);
     }
     else {
-        mpfrstr = PyUnicode_FromString(buffer);
+        mpfrstr = seenequal ? GMPy_MPFR_Pad_Equal(buffer, equalwidth, equalfill)
+                            : PyUnicode_FromString(buffer);
         mpfr_free_str(buffer);
     }
     if (!mpfrstr) {
