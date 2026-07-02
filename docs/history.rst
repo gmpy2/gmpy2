@@ -7,7 +7,7 @@ Changes in gmpy2 2.4.0
 ----------------------
 
 * Drop support for CPython < 3.11. (skirpichev)
-* Support '=' alignment option in floating-point formatting. (apoorva-01)
+* Support '=' alignment option when formatting mpz, xmpz and mpfr. (apoorva-01)
 
 Changes in gmpy2 2.3.0
 ----------------------

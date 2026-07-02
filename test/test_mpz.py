@@ -659,6 +659,21 @@ def test_mpz_format():
 
     assert '{:^#16o}'.format(a) == '     0o173      '
 
+    # issue 505: '=' (sign-aware padding) alignment, matching Python ints
+    assert f"{mpz(255):=10d}" == '       255'
+    assert f"{mpz(-255):=10d}" == '-      255'
+    assert f"{mpz(255):=+10d}" == '+      255'
+    assert f"{mpz(-255):=010d}" == '-000000255'
+    assert f"{mpz(255):= 10d}" == '       255'
+    assert f"{mpz(255):=#010x}" == '0x000000ff'
+    assert f"{mpz(-255):=#010x}" == '-0x00000ff'
+    assert f"{mpz(-255):=#010b}" == '-0b11111111'
+    assert f"{mpz(-255):=#012o}" == '-0o000000377'
+    assert f"{xmpz(-255):=#010x}" == '-0x00000ff'
+    assert f"{mpz(255):=10.2f}" == '    255.00'  # float spec still delegates to mpfr
+    raises(ValueError, lambda: format(mpz(1), '*=10d'))
+    raises(ValueError, lambda: format(mpz(1), "=1" + "0"*70))
+
     # floating-point formats
     assert '{:f}'.format(a) == '123.000000'
     assert '{:g}'.format(a) == '123.0'
