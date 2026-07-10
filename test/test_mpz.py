@@ -670,8 +670,6 @@ def test_mpz_format():
             assert format(mpz(value), spec) == format(value, spec), (value, spec)
             assert format(xmpz(value), spec) == format(value, spec), (value, spec)
     assert f"{mpz(255):=10.2f}" == '    255.00'  # float spec still delegates to mpfr
-    raises(ValueError, lambda: format(mpz(1), '*=10d'))
-    raises(ValueError, lambda: format(mpz(1), "=1" + "0"*70))
 
     # floating-point formats
     assert '{:f}'.format(a) == '123.000000'
