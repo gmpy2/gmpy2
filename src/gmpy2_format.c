@@ -310,23 +310,25 @@ GMPy_MPFR_Format(PyObject *self, PyObject *args)
         }
         if (!seendigits) {
             seendigits = 1;
-            if ((*p1 == 'e' || *p1 == 'E')
-                || ((*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
-                     *p1 == 'N') && (*(p1+1) == 'e' || *(p1+1) == 'E')))
-            {
-                *(p2++) = '.';
-                *(p2++) = '6';
-            }
-            if ((*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
-                 *p1 == 'N') && *(p1+1) == '\00')
-            {
-                long precision = (long)(log10(2) * (double)mpfr_get_prec(MPFR(self))) + 2;
-                char tmp[23];
+            if (!seendecimal) {
+                if ((*p1 == 'e' || *p1 == 'E')
+                    || ((*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
+                         *p1 == 'N') && (*(p1+1) == 'e' || *(p1+1) == 'E')))
+                {
+                    *(p2++) = '.';
+                    *(p2++) = '6';
+                }
+                if ((*p1 == 'U' || *p1 == 'D' || *p1 == 'Y' || *p1 == 'Z' ||
+                     *p1 == 'N') && *(p1+1) == '\00')
+                {
+                    long precision = (long)(log10(2) * (double)mpfr_get_prec(MPFR(self))) + 2;
+                    char tmp[23];
 
-                *(p2++) = '.';
-                sprintf(tmp, "%ld", precision);
-                for (char *c = tmp; *c != '\00'; c++) {
-                    *(p2++) = *c;
+                    *(p2++) = '.';
+                    sprintf(tmp, "%ld", precision);
+                    for (char *c = tmp; *c != '\00'; c++) {
+                        *(p2++) = *c;
+                    }
                 }
             }
             *(p2++) = 'R';
@@ -580,31 +582,33 @@ GMPy_MPC_Format(PyObject *self, PyObject *args)
         }
         if (!seendigits) {
             seendigits = 1;
-            if ((*p == 'e' || *p == 'E')
-                || ((*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
-                     *p == 'N') && (*(p+1) == 'e' || *(p+1) == 'E')))
-            {
-                *(rfmtptr++) = '.';
-                *(rfmtptr++) = '6';
-                *(ifmtptr++) = '.';
-                *(ifmtptr++) = '6';
-            }
-            if ((*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
-                 *p == 'N') && *(p+1) == '\00')
-            {
-                long precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_realref(MPC(self)))) + 2;
-                char tmp[23];
-
-                *(rfmtptr++) = '.';
-                sprintf(tmp, "%ld", precision);
-                for (char *c = tmp; *c != '\00'; c++) {
-                    *(rfmtptr++) = *c;
+            if (!seendecimal) {
+                if ((*p == 'e' || *p == 'E')
+                    || ((*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
+                         *p == 'N') && (*(p+1) == 'e' || *(p+1) == 'E')))
+                {
+                    *(rfmtptr++) = '.';
+                    *(rfmtptr++) = '6';
+                    *(ifmtptr++) = '.';
+                    *(ifmtptr++) = '6';
                 }
-                precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_imagref(MPC(self)))) + 2;
-                *(ifmtptr++) = '.';
-                sprintf(tmp, "%ld", precision);
-                for (char *c = tmp; *c != '\00'; c++) {
-                    *(ifmtptr++) = *c;
+                if ((*p == 'U' || *p == 'D' || *p == 'Y' || *p == 'Z' ||
+                     *p == 'N') && *(p+1) == '\00')
+                {
+                    long precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_realref(MPC(self)))) + 2;
+                    char tmp[23];
+
+                    *(rfmtptr++) = '.';
+                    sprintf(tmp, "%ld", precision);
+                    for (char *c = tmp; *c != '\00'; c++) {
+                        *(rfmtptr++) = *c;
+                    }
+                    precision = (long)(log10(2) * (double)mpfr_get_prec(mpc_imagref(MPC(self)))) + 2;
+                    *(ifmtptr++) = '.';
+                    sprintf(tmp, "%ld", precision);
+                    for (char *c = tmp; *c != '\00'; c++) {
+                        *(ifmtptr++) = *c;
+                    }
                 }
             }
             *(rfmtptr++) = 'R';
