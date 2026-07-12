@@ -360,6 +360,9 @@ def test_mpfr_format():
 
     pytest.raises(ValueError, lambda: format(mpfr(1), "1" + "0"*70))
 
+    # issue 710
+    assert format(gmpy2.sin(1), ".10De") == '8.4147098480e-01'
+
 
 def test_mpfr_digits():
     r, r2 = mpfr(5.6), mpfr(5)
