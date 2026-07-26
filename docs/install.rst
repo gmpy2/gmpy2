@@ -34,7 +34,7 @@ to install from the git repository and include required extra dependencies,
 for example the optional "tests" list, which include packages required
 for testing::
 
-    git clone git://github.com/gmpy2/gmpy2.git
+    git clone https://github.com/gmpy2/gmpy2.git
     cd gmpy
     pip install -e .[tests]
 
