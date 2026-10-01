@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [pypy3.11, "3.x"]
+        python-version: [pypy3.11, pypy3.12, "3.x"]
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
@@ -18,21 +18,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-      - run: sudo apt-get update
-      - run: sudo apt-get install libmpc-dev lcov
-      - name: Install dependencies
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libmpc-dev lcov
+      - name: Install test dependencies
         run: |
           pip install --upgrade pip 'setuptools<80' setuptools_scm
-          pip --verbose install --editable .[tests]
-      - name: Tests
-        run: |
-          pytest test/
-          PYTHONPATH=`pwd`/gmpy2 python test_cython/runtests.py
-      # XXX: why this doesn't work with pip install --editable above?
+          pip install pytest hypothesis cython mpmath 'numpy; python_version<"3.15"'
+      # Build a single instrumented extension: pip's editable install does not
+      # propagate CFLAGS to the compiler, so build with setup.py develop once.
       - name: Run coverage tests
         run: |
-          pip uninstall -y gmpy2
-          python setup.py clean
           CFLAGS="-coverage" python setup.py develop
           pytest test/
           PYTHONPATH=`pwd`/gmpy2 python test_cython/runtests.py
@@ -52,8 +51,9 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - run: sudo apt-get update
-      - run: sudo apt-get install lcov
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends lcov
       - uses: actions/download-artifact@v8
         with:
           pattern: coverage-*
