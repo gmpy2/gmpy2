@@ -40,7 +40,9 @@ content-type = 'text/x-rst'
 
 [project.optional-dependencies]
 docs = ['sphinx>=4', 'sphinx-rtd-theme>=1']
-tests = ['pytest', 'hypothesis', 'cython', 'mpmath', 'setuptools',
+tests = ['pytest', 'cython', 'mpmath', 'setuptools',
+         'hypothesis; implementation_name != "pypy"',
+         'hypothesis<=6.150.0; implementation_name == "pypy"',
          'numpy; python_version<"3.15" and implementation_name != "pypy"']
 
 [project.urls]
