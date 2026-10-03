@@ -3,6 +3,12 @@ Release Notes
 
 .. currentmodule:: gmpy2
 
+Changes in gmpy2 2.3.2
+----------------------
+
+* Fix processing defaults for e/E format types precision. (skirpichev)
+* Support PyPy3.12. (skirpichev)
+
 Changes in gmpy2 2.3.1
 ----------------------
 
