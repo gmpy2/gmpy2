@@ -37,6 +37,27 @@ a slice of bits, use a source value of ~0. The *tilde* operator inverts, or
 complements the bits in an integer. (~0 is -1 so you can also use -1.) In
 2s-complement format, -1 is represented by an arbitrary number of 1-bits.
 
+For both `mpz` and `xmpz`, reading a slice of a negative integer with
+nonnegative *start* and *stop* positions includes these sign bits beyond the
+integer's bit-length. The selected bits are packed into an `mpz`, starting
+with its least significant bit. For a positive *step*, *start* may be omitted
+and defaults to zero. For a negative *step*, *start* must be explicit to
+read beyond the bit-length. Slices with an omitted *stop*, a negative bound,
+or an omitted *start* and negative *step* keep their finite-sequence behavior,
+with bounds relative to the bit-length. Slicing nonnegative integers is
+unchanged.
+
+.. doctest::
+
+    >>> xmpz(-1)[4:5]
+    mpz(1)
+    >>> xmpz(-2)[:8]
+    mpz(254)
+    >>> xmpz(-2)[4:0:-1]
+    mpz(15)
+    >>> xmpz(-2)[0:]
+    mpz(2)
+
 If a value for *stop* is specified in a slice assignment and the actual
 bit-length of the `xmpz` is less than *stop*, then the destination
 `xmpz` is logically padded with 0-bits to length *stop*.

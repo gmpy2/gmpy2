@@ -1799,6 +1799,32 @@ GMPy_MPZ_Method_Length(MPZ_Object *self)
     return mpz_sizeinbase(self->z, 2);
 }
 
+static Py_ssize_t
+GMPy_MPZ_SliceIndices(mpz_t z, PyObject *item, Py_ssize_t *start,
+                     Py_ssize_t *stop, Py_ssize_t *step)
+{
+    if (PySlice_Unpack(item, start, stop, step) < 0) {
+        return -1;
+    }
+
+    /* Read sign bits beyond the magnitude's bit length only for bounded,
+     * nonnegative bit positions. Relative bounds and omitted endpoints keep
+     * their finite-sequence interpretation.
+     */
+    if (mpz_sgn(z) < 0 && !Py_IsNone(((PySliceObject*)item)->stop) &&
+        *start >= 0 && *stop >= 0 &&
+        (*step > 0 || !Py_IsNone(((PySliceObject*)item)->start))) {
+        if (*step > 0 && *start < *stop) {
+            return (*stop - *start - 1) / *step + 1;
+        }
+        if (*step < 0 && *start > *stop) {
+            return (*start - *stop - 1) / (-*step) + 1;
+        }
+        return 0;
+    }
+    return PySlice_AdjustIndices(mpz_sizeinbase(z, 2), start, stop, *step);
+}
+
 static PyObject *
 GMPy_MPZ_Method_SubScript(MPZ_Object *self, PyObject *item)
 {
@@ -1819,14 +1845,9 @@ GMPy_MPZ_Method_SubScript(MPZ_Object *self, PyObject *item)
         Py_ssize_t start, stop, step, slicelength, cur, i;
         MPZ_Object *result;
 
-        if (PySlice_GetIndicesEx(item,
-                        mpz_sizeinbase(self->z, 2),
-                        &start, &stop, &step, &slicelength) < 0) {
+        slicelength = GMPy_MPZ_SliceIndices(self->z, item, &start, &stop, &step);
+        if (slicelength < 0) {
             return NULL;
-        }
-
-        if ((step < 0 && start < stop) || (step > 0 && start > stop)) {
-            stop = start;
         }
 
         if (!(result = GMPy_MPZ_New(NULL))) {
@@ -1835,7 +1856,10 @@ GMPy_MPZ_Method_SubScript(MPZ_Object *self, PyObject *item)
 
         mpz_set_ui(result->z, 0);
         if (slicelength > 0) {
-            for (cur = start, i = 0; i < slicelength; cur += step, i++) {
+            for (cur = start, i = 0; i < slicelength; i++) {
+                if (i > 0) {
+                    cur += step;
+                }
                 if(mpz_tstbit(self->z, cur)) {
                     mpz_setbit(result->z, i);
                 }
