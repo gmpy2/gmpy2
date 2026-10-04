@@ -33,7 +33,7 @@ extern "C" {
 
 static PyTypeObject MPZ_Type;
 #define MPZ(obj) (((MPZ_Object*)(obj))->z)
-#define MPZ_Check(v) (((PyObject*)v)->ob_type == &MPZ_Type)
+#define MPZ_Check(v) (Py_TYPE(v) == &MPZ_Type)
 
 #ifdef __cplusplus
 }
