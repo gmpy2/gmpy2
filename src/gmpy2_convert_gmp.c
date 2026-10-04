@@ -44,7 +44,7 @@
 static int
 mpz_set_PyLong(mpz_t z, PyObject *obj)
 {
-#ifndef PYPY_VERSION
+#if !defined(PYPY_VERSION) && !defined(GRAALVM_PYTHON)
     const PyLongLayout *layout = PyLong_GetNativeLayout();
     PyLongExport long_export = {0, 0, 0, 0, 0};
 
@@ -190,7 +190,7 @@ GMPy_PyLong_From_MPZ(MPZ_Object *obj, CTXT_Object *context)
         return PyLong_FromLong(mpz_get_si(obj->z));
     }
 
-#ifndef PYPY_VERSION
+#if !defined(PYPY_VERSION) && !defined(GRAALVM_PYTHON)
     const PyLongLayout *layout = PyLong_GetNativeLayout();
     size_t size = (mpz_sizeinbase(obj->z, 2) +
                    layout->bits_per_digit - 1)/layout->bits_per_digit;

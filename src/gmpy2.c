@@ -100,7 +100,7 @@ LGPL 3 or later.";
 /* The following global structures are used by gmpy_cache.c.
  */
 
-#if !defined(PYPY_VERSION)
+#if !defined(PYPY_VERSION) && !defined(GRAALVM_PYTHON)
 #define CACHE_SIZE (100)
 #else
 #define CACHE_SIZE (0)
@@ -919,7 +919,9 @@ gmpy_exec(PyObject *gmpy_module)
         /* LCOV_EXCL_STOP */
     }
 
+#ifndef GRAALVM_PYTHON
     PyOS_setsig(SIGFPE, gmp_abort_handler);
+#endif
 
     return 0;
 }
