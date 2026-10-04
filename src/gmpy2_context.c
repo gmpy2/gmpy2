@@ -184,7 +184,11 @@ static PyObject *
 GMPy_CTXT_Exit(PyObject *self, PyObject *args)
 {
     CTXT_Object *ctx = (CTXT_Object*)self;
+#ifndef GRAALVM_PYTHON
     int res = PyContextVar_Reset(current_context_var, ctx->token);
+#else
+    int res = 0;
+#endif
     Py_DECREF(ctx->token);
     if (res == -1) {
         SYSTEM_ERROR("Unexpected failure in restoring context.");
