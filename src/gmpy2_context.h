@@ -69,7 +69,7 @@ static PyTypeObject CTXT_Type;
         if (_save) PyEval_RestoreThread(_save); \
     } \
 
-#define CTXT_Check(v) (((PyObject*)v)->ob_type == &CTXT_Type)
+#define CTXT_Check(v) (Py_TYPE(v) == &CTXT_Type)
 
 #define GET_MPFR_PREC(c) (c->ctx.mpfr_prec)
 #define GET_REAL_PREC(c) ((c->ctx.real_prec==GMPY_DEFAULT)?GET_MPFR_PREC(c):c->ctx.real_prec)

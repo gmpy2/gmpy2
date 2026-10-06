@@ -42,7 +42,7 @@ extern "C" {
 
 static PyTypeObject RandomState_Type;
 #define RANDOM_STATE(obj) (((RandomState_Object *)(obj))->state)
-#define RandomState_Check(v) (((PyObject*)v)->ob_type == &RandomState_Type)
+#define RandomState_Check(v) (Py_TYPE(v) == &RandomState_Type)
 
 static RandomState_Object * GMPy_RandomState_New(void);
 static void                 GMPy_RandomState_Dealloc(RandomState_Object *self);

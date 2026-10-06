@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 static PyTypeObject MPFR_Type;
-#define MPFR_Check(v) (((PyObject*)v)->ob_type == &MPFR_Type)
+#define MPFR_Check(v) (Py_TYPE(v) == &MPFR_Type)
 
 #define GMPY_DIVZERO(msg) PyErr_SetString(GMPyExc_DivZero, msg)
 #define GMPY_INEXACT(msg) PyErr_SetString(GMPyExc_Inexact, msg)

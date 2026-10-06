@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 static PyTypeObject MPQ_Type;
-#define MPQ_Check(v) (((PyObject*)v)->ob_type == &MPQ_Type)
+#define MPQ_Check(v) (Py_TYPE(v) == &MPQ_Type)
 
 #ifdef __cplusplus
 }
