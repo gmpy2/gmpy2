@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
 import cmath
 import inspect
+import platform
 import sys
 
 import pytest
@@ -593,6 +594,9 @@ def test_mpc_signatures():
     for f in dir(cls):
         a = getattr(cls, f)
         if callable(a) and f != '__class__':
+            # see oracle/graalpython#1192
+            if f == '__new__' and platform.python_implementation() == "GraalVM":
+                continue
             _ = inspect.signature(a)  # not raises
 
 

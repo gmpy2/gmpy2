@@ -1,6 +1,7 @@
 import inspect
 import math
 import pickle
+import platform
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
@@ -999,6 +1000,9 @@ def test_mpfr_signatures():
     for f in dir(cls):
         a = getattr(cls, f)
         if callable(a) and f != '__class__':
+            # see oracle/graalpython#1192
+            if f == '__new__' and platform.python_implementation() == "GraalVM":
+                continue
             _ = inspect.signature(a)  # not raises
 
 

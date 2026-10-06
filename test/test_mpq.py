@@ -2,6 +2,7 @@ import inspect
 import math
 import numbers
 import pickle
+import platform
 import sys
 from decimal import Decimal
 from fractions import Fraction
@@ -729,4 +730,7 @@ def test_mpq_signatures():
     for f in dir(cls):
         a = getattr(cls, f)
         if callable(a) and f != '__class__':
+            # see oracle/graalpython#1192
+            if f == '__new__' and platform.python_implementation() == "GraalVM":
+                continue
             _ = inspect.signature(a)  # not raises

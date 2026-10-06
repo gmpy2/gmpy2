@@ -1,4 +1,5 @@
 import inspect
+import platform
 import sys
 from ctypes import memmove
 
@@ -449,4 +450,7 @@ def test_xmpz_signatures():
     for f in dir(cls):
         a = getattr(cls, f)
         if callable(a) and f != '__class__':
+            # see oracle/graalpython#1192
+            if f == '__new__' and platform.python_implementation() == "GraalVM":
+                continue
             _ = inspect.signature(a)  # not raises
