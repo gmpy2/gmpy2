@@ -237,26 +237,15 @@ GMPy_XMPZ_Method_AssignSubScript(XMPZ_Object* self, PyObject* item, PyObject* va
         Py_ssize_t cur, i, seq_len, start, stop, step, slicelength, temp;
 
         seq_len = mpz_sizeinbase(self->z, 2);
-        if (!Py_IsNone(((PySliceObject*)item)->stop)) {
-            /* If a fixed endpoint is specified, and the endpoint is greater
-             * than the length of the xmpz object, allow the underlying xmpz
-             * object to be made larger.
-             */
-            temp = PyLong_AsSsize_t(((PySliceObject*)item)->stop);
-            if (temp == -1  && PyErr_Occurred()) {
-                return 0;
-            }
-            if (temp > seq_len) {
-                seq_len = temp;
+        if (!PySlice_Unpack(item, &start, &stop, &step)) {
+            if (stop > seq_len && stop != PY_SSIZE_T_MAX) {
+                seq_len = stop;
             }
         }
-
-        if (PySlice_GetIndicesEx(item,
-                        seq_len,
-                        &start, &stop, &step, &slicelength) < 0) {
+        if (PySlice_Unpack(item, &start, &stop, &step) < 0) {
             return -1;
         }
-
+        slicelength = PySlice_AdjustIndices(seq_len, &start, &stop, step);
         if ((step < 0 && start < stop) || (step > 0 && start > stop)) {
             stop = start;
         }
@@ -265,7 +254,6 @@ GMPy_XMPZ_Method_AssignSubScript(XMPZ_Object* self, PyObject* item, PyObject* va
             TYPE_ERROR("deleting bits not supported");
             return -1;
         }
-
         else {
             int bit;
             MPZ_Object *tempx;
