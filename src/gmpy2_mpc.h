@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 static PyTypeObject MPC_Type;
-#define MPC_Check(v) (((PyObject*)v)->ob_type == &MPC_Type)
+#define MPC_Check(v) (Py_TYPE(v) == &MPC_Type)
 
 /*
  * Define macros for comparing with zero, checking if either component is

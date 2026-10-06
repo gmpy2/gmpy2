@@ -489,14 +489,14 @@ typedef struct {
 
 static void **GMPy_C_API;
 
-#define MPZ_Check(op)    ((op)->ob_type == (PyTypeObject*)GMPy_C_API[MPZ_Type_NUM])
-#define XMPZ_Check(op)   ((op)->ob_type == (PyTypeObject*)GMPy_C_API[XMPZ_Type_NUM])
-#define MPQ_Check(op)    ((op)->ob_type == (PyTypeObject*)GMPy_C_API[MPQ_Type_NUM])
-#define XMPQ_Check(op)   ((op)->ob_type == (PyTypeObject*)GMPy_C_API[XMPQ_Type_NUM])
-#define MPFR_Check(op)   ((op)->ob_type == (PyTypeObject*)GMPy_C_API[MPFR_Type_NUM])
-#define XMPFR_Check(op)  ((op)->ob_type == (PyTypeObject*)GMPy_C_API[XMPFR_Type_NUM])
-#define MPC_Check(op)    ((op)->ob_type == (PyTypeObject*)GMPy_C_API[MPC_Type_NUM])
-#define XMPC_Check(op)   ((op)->ob_type == (PyTypeObject*)GMPy_C_API[XMPC_Type_NUM])
+#define MPZ_Check(op)    (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[MPZ_Type_NUM])
+#define XMPZ_Check(op)   (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[XMPZ_Type_NUM])
+#define MPQ_Check(op)    (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[MPQ_Type_NUM])
+#define XMPQ_Check(op)   (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[XMPQ_Type_NUM])
+#define MPFR_Check(op)   (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[MPFR_Type_NUM])
+#define XMPFR_Check(op)  (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[XMPFR_Type_NUM])
+#define MPC_Check(op)    (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[MPC_Type_NUM])
+#define XMPC_Check(op)   (Py_TYPE(op) == (PyTypeObject*)GMPy_C_API[XMPC_Type_NUM])
 
 #define GMPy_MPZ_New         (*(GMPy_MPZ_New_RETURN         (*)GMPy_MPZ_New_PROTO)         GMPy_C_API[GMPy_MPZ_New_NUM])
 #define GMPy_MPZ_NewInit     (*(GMPy_MPZ_NewInit_RETURN     (*)GMPy_MPZ_NewInit_PROTO)     GMPy_C_API[GMPy_MPZ_NewInit_NUM])
