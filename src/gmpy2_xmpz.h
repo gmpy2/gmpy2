@@ -33,7 +33,7 @@ extern "C" {
 
 static PyTypeObject XMPZ_Type;
 #define XMPZ(obj) (((XMPZ_Object*)(obj))->z)
-#define XMPZ_Check(v) (((PyObject*)v)->ob_type == &XMPZ_Type)
+#define XMPZ_Check(v) (Py_TYPE(v) == &XMPZ_Type)
 #define CHECK_MPZANY(v) (MPZ_Check(v) || XMPZ_Check(v))
 
 typedef struct {
@@ -44,7 +44,7 @@ typedef struct {
 } GMPy_Iter_Object;
 
 static PyTypeObject GMPy_Iter_Type;
-#define GMPy_Iter_Check(v) (((PyObject*)v)->ob_type == &GMPy_Iter_Type)
+#define GMPy_Iter_Check(v) (Py_TYPE(v) == &GMPy_Iter_Type)
 
 #ifdef __cplusplus
 }

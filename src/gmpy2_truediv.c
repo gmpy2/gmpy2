@@ -244,15 +244,6 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
         MPC_Object *tempx = NULL;
         MPFR_Object *tempy = NULL;
 
-        if (mpfr_zero_p(MPFR(y))) {
-            context->ctx.divzero = 1;
-            if (context->ctx.traps & TRAP_DIVZERO) {
-                GMPY_DIVZERO("'mpc' division by zero");
-                Py_DECREF((PyObject*)result);
-                return NULL;
-            }
-        }
-
         if (!(tempx = GMPy_MPC_From_ComplexWithType(x, xtype, 1, 1, context)) ||
             !(tempy = GMPy_MPFR_From_RealWithType(y, ytype, 1, context))) {
             /* LCOV_EXCL_START */
@@ -262,6 +253,17 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
             return NULL;
             /* LCOV_EXCL_STOP */
         }
+        if (mpfr_zero_p(MPFR(tempy))) {
+            context->ctx.divzero = 1;
+            if (context->ctx.traps & TRAP_DIVZERO) {
+                GMPY_DIVZERO("'mpc' division by zero");
+                Py_DECREF((PyObject*)tempx);
+                Py_DECREF((PyObject*)tempy);
+                Py_DECREF((PyObject*)result);
+                return NULL;
+            }
+        }
+        mpfr_clear_flags();
         result->rc = mpc_div_fr(result->c, tempx->c, MPFR(tempy), GET_MPC_ROUND(context));
         Py_DECREF((PyObject*)tempx);
         Py_DECREF((PyObject*)tempy);
@@ -273,15 +275,6 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
         MPC_Object *tempy = NULL;
         MPFR_Object *tempx = NULL;
 
-        if (MPC_IS_ZERO_P(y)) {
-            context->ctx.divzero = 1;
-            if (context->ctx.traps & TRAP_DIVZERO) {
-                GMPY_DIVZERO("'mpc' division by zero");
-                Py_DECREF((PyObject*)result);
-                return NULL;
-            }
-        }
-
         if (!(tempy = GMPy_MPC_From_ComplexWithType(y, ytype, 1, 1, context)) ||
             !(tempx = GMPy_MPFR_From_RealWithType(x, xtype, 1, context))) {
             /* LCOV_EXCL_START */
@@ -291,6 +284,17 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
             return NULL;
             /* LCOV_EXCL_STOP */
         }
+        if (MPC_IS_ZERO_P(tempy)) {
+            context->ctx.divzero = 1;
+            if (context->ctx.traps & TRAP_DIVZERO) {
+                GMPY_DIVZERO("'mpc' division by zero");
+                Py_DECREF((PyObject*)tempx);
+                Py_DECREF((PyObject*)tempy);
+                Py_DECREF((PyObject*)result);
+                return NULL;
+            }
+        }
+        mpfr_clear_flags();
         result->rc = mpc_fr_div(result->c, MPFR(tempx), tempy->c, GET_MPC_ROUND(context));
         Py_DECREF((PyObject*)tempx);
         Py_DECREF((PyObject*)tempy);
@@ -301,15 +305,6 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
     if (IS_TYPE_COMPLEX(xtype) && IS_TYPE_COMPLEX(ytype)) {
         MPC_Object *tempx = NULL, *tempy = NULL;
 
-        if (MPC_IS_ZERO_P(y)) {
-            context->ctx.divzero = 1;
-            if (context->ctx.traps & TRAP_DIVZERO) {
-                GMPY_DIVZERO("'mpc' division by zero");
-                Py_DECREF((PyObject*)result);
-                return NULL;
-            }
-        }
-
         if (!(tempx = GMPy_MPC_From_ComplexWithType(x, xtype, 1, 1, context)) ||
             !(tempy = GMPy_MPC_From_ComplexWithType(y, ytype, 1, 1, context))) {
             /* LCOV_EXCL_START */
@@ -319,7 +314,17 @@ GMPy_Complex_TrueDivWithType(PyObject *x, int xtype, PyObject *y, int ytype,
             return NULL;
             /* LCOV_EXCL_STOP */
         }
-
+        if (MPC_IS_ZERO_P(tempy)) {
+            context->ctx.divzero = 1;
+            if (context->ctx.traps & TRAP_DIVZERO) {
+                GMPY_DIVZERO("'mpc' division by zero");
+                Py_DECREF((PyObject*)tempx);
+                Py_DECREF((PyObject*)tempy);
+                Py_DECREF((PyObject*)result);
+                return NULL;
+            }
+        }
+        mpfr_clear_flags();
         result->rc = mpc_div(result->c, tempx->c, tempy->c, GET_MPC_ROUND(context));
         Py_DECREF((PyObject*)tempx);
         Py_DECREF((PyObject*)tempy);
