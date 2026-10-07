@@ -166,14 +166,9 @@ GMPy_XMPZ_Method_SubScript(XMPZ_Object* self, PyObject* item)
         Py_ssize_t start, stop, step, slicelength, cur, i;
         MPZ_Object *result;
 
-        if (PySlice_GetIndicesEx(item,
-                         mpz_sizeinbase(self->z, 2),
-                         &start, &stop, &step, &slicelength) < 0) {
+        slicelength = GMPy_MPZ_SliceIndices(self->z, item, &start, &stop, &step);
+        if (slicelength < 0) {
             return NULL;
-        }
-
-        if ((step < 0 && start < stop) || (step > 0 && start > stop)) {
-            stop = start;
         }
 
         if (!(result = GMPy_MPZ_New(context))) {
@@ -182,7 +177,10 @@ GMPy_XMPZ_Method_SubScript(XMPZ_Object* self, PyObject* item)
 
         mpz_set_ui(result->z, 0);
         if (slicelength > 0) {
-            for (cur = start, i = 0; i < slicelength; cur += step, i++) {
+            for (cur = start, i = 0; i < slicelength; i++) {
+                if (i > 0) {
+                    cur += step;
+                }
                 if (mpz_tstbit(self->z, cur)) {
                     mpz_setbit(result->z, i);
                 }
