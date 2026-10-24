@@ -120,8 +120,13 @@ positive denominator.");
 static PyObject *
 GMPy_MPQ_Method_As_Integer_Ratio(PyObject *self, PyObject *Py_UNUSED(ignored))
 {
-    return PyTuple_Pack(2, GMPy_MPQ_Attrib_GetNumer((MPQ_Object*)self, NULL),
-                        GMPy_MPQ_Attrib_GetDenom((MPQ_Object*)self, NULL));
+    PyObject *numer = GMPy_MPQ_Attrib_GetNumer((MPQ_Object*)self, NULL);
+    PyObject *denom = GMPy_MPQ_Attrib_GetDenom((MPQ_Object*)self, NULL);
+    PyObject *tuple = PyTuple_Pack(2, numer, denom);
+
+    Py_DECREF(numer);
+    Py_DECREF(denom);
+    return tuple;
 }
 
 PyDoc_STRVAR(GMPy_doc_mpq_method_from_float,
