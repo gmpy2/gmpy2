@@ -1882,9 +1882,13 @@ PyDoc_STRVAR(GMPy_doc_mpz_method_as_integer_ratio,
 static PyObject *
 GMPy_MPZ_Method_As_Integer_Ratio(PyObject *self, PyObject *args)
 {
-    return PyTuple_Pack(2,
-                        GMPy_MPZ_Attrib_GetNumer((MPZ_Object*)self, NULL),
-                        GMPy_MPZ_Attrib_GetDenom((MPZ_Object*)self, NULL));
+    PyObject *numer = GMPy_MPZ_Attrib_GetNumer((MPZ_Object*)self, NULL);
+    PyObject *denom = GMPy_MPZ_Attrib_GetDenom((MPZ_Object*)self, NULL);
+    PyObject *tuple = PyTuple_Pack(2, numer, denom);
+
+    Py_DECREF(numer);
+    Py_DECREF(denom);
+    return tuple;
 }
 
 PyDoc_STRVAR(GMPy_doc_mpz_method_to_bytes,
