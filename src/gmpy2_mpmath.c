@@ -99,7 +99,7 @@ Pympz_mpmath_normalize_fast(PyObject *self, PyObject *const *args, Py_ssize_t na
 {
     long sign = 0;
     long carry = 0;
-    mp_bitcnt_t zbits, shift = 0, bc = 0, prec = 0;
+    mp_bitcnt_t zbits = 0, shift = 0, bc = 0, prec = 0;
     PyObject *exp = NULL, *newexp = NULL, *newexp2 = NULL, *tmp = NULL, *rndstr = NULL;
     MPZ_Object *man = NULL, *upper = NULL, *lower = NULL;
     Py_UCS4 rnd = 0;
@@ -235,7 +235,7 @@ Pympz_mpmath_normalize_fast(PyObject *self, PyObject *const *args, Py_ssize_t na
     }
 
     /* Strip trailing 0 bits. */
-    if ((zbits = mpz_scan1(upper->z, 0)))
+    if (mpz_sgn(upper->z) && (zbits = mpz_scan1(upper->z, 0)))
         mpz_tdiv_q_2exp(upper->z, upper->z, zbits);
 
     if (!(tmp = GMPy_PyLong_FromMpBitCnt(zbits))) {
