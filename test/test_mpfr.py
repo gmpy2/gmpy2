@@ -318,6 +318,11 @@ def test_mpfr_mpmath():
     pytest.raises(TypeError, lambda: mpmath.mpf(("!", 1,)))
 
 
+def test__mpmath_normalize():
+    assert gmpy2._mpmath_normalize(0, mpz(3),
+                                   -2, 2, 0, 'f') == (0, mpz(0), 0, 0)
+
+
 def test_mpfr_format():
     r, r1, r2 = mpfr(5.6), mpfr(-3), mpfr(5)
 
